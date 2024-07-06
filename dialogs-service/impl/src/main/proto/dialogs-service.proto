@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.instant.message.app.grpc";
+option java_outer_classname = "DialogsServiceProto";
+
+package instant_messaging_app;
+
+// Commons
+message UUID {
+  string value = 1;
+}
+
+message Acknowledgement {
+  bool success = 1;
+}
+
+// Commands
+
+message InitializeDialog {
+  UUID dialog_id = 1;
+  UUID requester = 2;
+  repeated UUID participantsToInvite = 3;
+  string dialogTopic = 4;
+  int64 timestamp = 5;
+}
+
+message SendMessage {
+  UUID message_id = 1;
+  UUID dialog_id = 2;
+  UUID from = 3;
+  string content = 4;
+  int64 timestamp = 5;
+}
+
+message RemoveMessage {
+  UUID message_id = 1;
+  UUID dialog_id = 2;
+  UUID requester = 3;
+  int64 timestamp = 4;
+}
+
+message MarkAsRead {
+  UUID message_id = 1;
+  UUID dialog_id = 2;
+  UUID requester = 3;
+  int64 timestamp = 4;
+}
+
+message LeaveConversation {
+  UUID dialogId = 1;
+  UUID requester = 2;
+  int64 timestamp = 3;
+}
+
+message EndConversation {
+  UUID dialog_id = 1;
+  UUID requester = 2;
+  int64 timestamp = 3;
+}
+
+// Queries
+message FetchDialogQuery {
+  UUID dialog_id = 1;
+  UUID requester = 2;
+}
+
+message FetchDialogResponse {
+  repeated DialogMessage messages = 1;
+  repeated UUID participants = 2;
+
+  message DialogMessage {
+    UUID message_id = 1;
+    UUID from = 2;
+    int64 timestamp = 3;
+  }
+}
+
+// Services
+
+service DialogWriteService {
+  rpc initializeDialog(InitializeDialog) returns (Acknowledgement) {}
+  rpc sendMessage(SendMessage) returns (Acknowledgement) {}
+  rpc removeMessage(RemoveMessage) returns (Acknowledgement) {}
+  rpc markAsRead(MarkAsRead) returns (Acknowledgement) {}
+  rpc leaveConversation(LeaveConversation) returns (Acknowledgement) {}
+  rpc endConversation(EndConversation) returns (Acknowledgement) {}
+}
+
+service DialogReadService {
+  rpc fetchDialog(FetchDialogQuery) returns (FetchDialogResponse) {}
+}

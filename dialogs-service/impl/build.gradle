@@ -1,0 +1,103 @@
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id 'application'
+    id 'com.lightbend.akka.grpc.gradle' version '2.4.3'
+}
+
+tasks.register('wrapper', Wrapper) {
+    gradleVersion = '8.5'
+}
+
+// Just to fix issue with Intellij
+tasks.register('prepareKotlinBuildScriptModel') {
+}
+
+group = 'org.instant.messaging.app'
+archivesBaseName = 'app'
+
+var mainClass = "org.algo.solve.Main"
+
+project.setProperty("mainClassName", mainClass)
+
+shadowJar {
+    append 'reference.conf'
+    append 'version.conf'
+    mergeServiceFiles()
+    zip64 true
+}
+
+repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    maven {
+        url "https://repo.akka.io/maven"
+    }
+}
+
+tasks.withType(Copy).configureEach {
+    filesMatching("**/*.proto") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+}
+
+dependencies {
+    implementation platform("com.typesafe.akka:akka-bom_${ScalaBinary}:2.9.3")
+
+    // Akka Core
+    implementation "com.typesafe.akka:akka-actor-typed_${ScalaBinary}"
+    implementation "com.typesafe.akka:akka-stream-typed_${ScalaBinary}"
+
+    // Akka Cluster
+    implementation "com.typesafe.akka:akka-cluster_${ScalaBinary}"
+    implementation "com.typesafe.akka:akka-cluster-typed_${ScalaBinary}"
+    implementation "com.typesafe.akka:akka-cluster-sharding-typed_${ScalaBinary}"
+    implementation "com.typesafe.akka:akka-stream-kafka-cluster-sharding_${ScalaBinary}:6.0.0"
+
+    // Akka Cluster management
+    implementation "com.lightbend.akka.management:akka-management-cluster-http_${ScalaBinary}:${AkkaManagementVersion}"
+    implementation "com.lightbend.akka.management:akka-management-cluster-bootstrap_${ScalaBinary}:${AkkaManagementVersion}"
+
+    // Akka Discovery
+    implementation "com.typesafe.akka:akka-discovery_${ScalaBinary}"
+    implementation "com.lightbend.akka.discovery:akka-discovery-kubernetes-api_${ScalaBinary}:${AkkaManagementVersion}"
+
+    // Akka HTTP
+    implementation "com.typesafe.akka:akka-http_${ScalaBinary}"
+    implementation "com.typesafe.akka:akka-http-spray-json_${ScalaBinary}"
+
+    // Akka gRPC
+    implementation "com.lightbend.akka.grpc:akka-grpc-runtime_${ScalaBinary}"
+
+    // Akka persistence
+    implementation "com.typesafe.akka:akka-persistence-typed_${ScalaBinary}"
+    implementation "com.lightbend.akka:akka-persistence-r2dbc_${ScalaBinary}:1.2.4"
+
+    // Akka projections
+    implementation "com.lightbend.akka:akka-projection-core_${ScalaBinary}:1.5.4"
+    implementation "com.lightbend.akka:akka-projection-r2dbc_${ScalaBinary}:1.5.4"
+
+    // Serialization
+    implementation "com.typesafe.akka:akka-serialization-jackson_${ScalaBinary}"
+
+    // Slf4j backend
+    implementation "ch.qos.logback:logback-classic:1.2.13"
+
+    // Kafka
+    implementation "com.typesafe.akka:akka-stream-kafka_${ScalaBinary}:6.0.0"
+    implementation "com.typesafe.akka:akka-stream_${ScalaBinary}"
+
+    // BCrypt implementation
+    implementation 'at.favre.lib:bcrypt:0.10.2'
+
+    // Tests
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.assertj:assertj-core:3.26.0'
+    testImplementation "com.typesafe.akka:akka-persistence-testkit_${ScalaBinary}"
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,2 @@
+rootProject.name = 'dialogs-service'
+include 'impl'
