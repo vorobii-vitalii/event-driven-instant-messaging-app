@@ -20,6 +20,12 @@ public record ActiveDialogState(
 		return new ActiveDialogState(dialogTopic, newMessages, createdBy, participants);
 	}
 
+	public ActiveDialogState removeMessage(UUID messageId) {
+		Map<UUID, Message> newMessages = new HashMap<>(messages);
+		newMessages.remove(messageId);
+		return new ActiveDialogState(dialogTopic, newMessages, createdBy, participants);
+	}
+
 	public boolean isParticipantAbsent(UUID participant) {
 		return !participants.contains(participant);
 	}

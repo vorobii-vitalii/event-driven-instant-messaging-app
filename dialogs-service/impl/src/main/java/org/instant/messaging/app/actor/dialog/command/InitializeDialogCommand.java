@@ -4,10 +4,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import akka.Done;
+import akka.actor.typed.ActorRef;
+import akka.pattern.StatusReply;
+
 public record InitializeDialogCommand(
 		UUID requester,
 		List<UUID> otherParticipants,
 		String dialogTopic,
-		Instant initializedAt
+		Instant initializedAt,
+		ActorRef<StatusReply<Done>> replyTo
 ) implements DialogCommand {
 }
