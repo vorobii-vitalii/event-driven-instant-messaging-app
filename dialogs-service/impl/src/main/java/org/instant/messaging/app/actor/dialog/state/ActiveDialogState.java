@@ -7,6 +7,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
+import javax.annotation.concurrent.Immutable;
+
+import lombok.Builder;
+
+@Immutable
+@Builder
 public record ActiveDialogState(
 		String dialogTopic,
 		Map<UUID, Message> messages,

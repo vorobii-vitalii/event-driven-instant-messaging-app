@@ -8,6 +8,9 @@ import java.util.UUID;
 
 import org.instant.messaging.app.actor.dialog.command.SendMessageCommand;
 
+import lombok.Builder;
+
+@Builder
 public record Message(
 		UUID messageId,
 		UUID from,
