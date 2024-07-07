@@ -16,7 +16,7 @@ tasks.register('prepareKotlinBuildScriptModel') {
 group = 'org.instant.messaging.app'
 archivesBaseName = 'app'
 
-var mainClass = "org.algo.solve.Main"
+var mainClass = "org.instant.messaging.app.Main"
 
 project.setProperty("mainClassName", mainClass)
 
@@ -100,7 +100,6 @@ dependencies {
     // Lombok
     compileOnly "org.projectlombok:lombok:$LombokVersion"
     annotationProcessor "org.projectlombok:lombok:$LombokVersion"
-
     testCompileOnly "org.projectlombok:lombok:$LombokVersion"
     testAnnotationProcessor "org.projectlombok:lombok:$LombokVersion"
 

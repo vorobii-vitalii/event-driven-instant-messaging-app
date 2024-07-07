@@ -1,7 +1,5 @@
 package org.instant.messaging.app.actor.dialog.command_handler;
 
-import java.util.function.Supplier;
-
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command.SendMessageCommand;
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
@@ -19,8 +17,7 @@ public class SendMessageCommandHandlerConfigurer implements DialogCommandHandler
 	@Override
 	public void configure(
 			CommandHandlerWithReplyBuilder<DialogCommand, DialogEvent, DialogState> commandHandlerBuilder,
-			ActorContext<DialogCommand> actorContext,
-			Supplier<EffectFactories<DialogEvent, DialogState>> effectFactory
+			ActorContext<DialogCommand> actorContext
 	) {
 		var log = actorContext.getLog();
 		commandHandlerBuilder
@@ -29,7 +26,7 @@ public class SendMessageCommandHandlerConfigurer implements DialogCommandHandler
 					var from = command.from();
 					if (state.isParticipantAbsent(from)) {
 						log.info("Sender of message {} is not part of the dialog...", from);
-						return effectFactory.get()
+						return new EffectFactories<DialogEvent, DialogState>()
 								.none()
 								.thenReply(command.replyTo(), v -> StatusReply.error("You are not part of conversation"));
 					}
@@ -39,16 +36,16 @@ public class SendMessageCommandHandlerConfigurer implements DialogCommandHandler
 						log.info("Dialog already contains message by id = {}", messageId);
 						if (foundMessage.get().wasCreatedFromCommand(command)) {
 							log.info("Message was created from same command. Sending acknowledgement!");
-							return effectFactory.get().none().thenReply(command.replyTo(), v -> StatusReply.ack());
+							return new EffectFactories<DialogEvent, DialogState>().none().thenReply(command.replyTo(), v -> StatusReply.ack());
 						}
 						log.warn("Message was created from different command. Sending error!");
-						return effectFactory.get()
+						return new EffectFactories<DialogEvent, DialogState>()
 								.none()
 								.thenReply(command.replyTo(), v -> StatusReply.error("Something went wrong!"));
 					}
 					var event = new MessageSentEvent(messageId, from, command.messageContent(), command.timestamp());
 					log.info("Persisting message sent event {}", event);
-					return effectFactory.get().persist(event).thenReply(command.replyTo(), v -> StatusReply.ack());
+					return new EffectFactories<DialogEvent, DialogState>().persist(event).thenReply(command.replyTo(), v -> StatusReply.ack());
 				});
 	}
 

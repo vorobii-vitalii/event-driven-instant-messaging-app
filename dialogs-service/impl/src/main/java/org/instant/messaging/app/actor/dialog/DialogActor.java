@@ -49,7 +49,7 @@ public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogC
 	@Override
 	public CommandHandlerWithReply<DialogCommand, DialogEvent, DialogState> commandHandler() {
 		var commandHandlerBuilder = newCommandHandlerWithReplyBuilder();
-		dialogCommandHandlerConfigurers.forEach(configurer -> configurer.configure(commandHandlerBuilder, actorContext, this::Effect));
+		dialogCommandHandlerConfigurers.forEach(configurer -> configurer.configure(commandHandlerBuilder, actorContext));
 		return commandHandlerBuilder.build();
 	}
 

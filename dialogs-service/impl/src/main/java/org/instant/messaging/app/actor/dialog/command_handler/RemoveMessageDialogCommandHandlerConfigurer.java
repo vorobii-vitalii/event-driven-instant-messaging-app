@@ -1,7 +1,6 @@
 package org.instant.messaging.app.actor.dialog.command_handler;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command.RemoveMessageCommand;
@@ -20,8 +19,7 @@ public class RemoveMessageDialogCommandHandlerConfigurer implements DialogComman
 	@Override
 	public void configure(
 			CommandHandlerWithReplyBuilder<DialogCommand, DialogEvent, DialogState> commandHandlerBuilder,
-			ActorContext<DialogCommand> actorContext,
-			Supplier<EffectFactories<DialogEvent, DialogState>> effectFactory
+			ActorContext<DialogCommand> actorContext
 	) {
 		var log = actorContext.getLog();
 		commandHandlerBuilder
@@ -30,7 +28,7 @@ public class RemoveMessageDialogCommandHandlerConfigurer implements DialogComman
 					var requester = command.requester();
 					if (state.isParticipantAbsent(requester)) {
 						log.info("Requester of message {} removal {} is not part of the dialog...", command.messageId(), requester);
-						return effectFactory.get()
+						return new EffectFactories<DialogEvent, DialogState>()
 								.none()
 								.thenReply(command.replyTo(), v -> StatusReply.error("You are not part of conversation"));
 					}
@@ -38,16 +36,16 @@ public class RemoveMessageDialogCommandHandlerConfigurer implements DialogComman
 					var foundMessage = state.findMessageById(messageId);
 					if (foundMessage.isEmpty()) {
 						log.info("Message {} is currently absent", messageId);
-						return effectFactory.get().none().thenReply(command.replyTo(), v -> StatusReply.ack());
+						return new EffectFactories<DialogEvent, DialogState>().none().thenReply(command.replyTo(), v -> StatusReply.ack());
 					}
 					if (Objects.equals(foundMessage.get().from(), requester)) {
 						log.info("{} removed message {}", requester, messageId);
-						return effectFactory.get()
+						return new EffectFactories<DialogEvent, DialogState>()
 								.persist(new MessageRemovedEvent(messageId, command.timestamp()))
 								.thenReply(command.replyTo(), v -> StatusReply.ack());
 					}
 					log.warn("{} tried to remove message {} which wasn't sent by him", requester, messageId);
-					return effectFactory.get()
+					return new EffectFactories<DialogEvent, DialogState>()
 							.none()
 							.thenReply(command.replyTo(), v -> StatusReply.error("You cannot remove message this message"));
 				});

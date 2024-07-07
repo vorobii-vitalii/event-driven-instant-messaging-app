@@ -1,7 +1,5 @@
 package org.instant.messaging.app.actor.dialog.command_handler;
 
-import java.util.function.Supplier;
-
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command.MarkAsReadCommand;
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
@@ -18,8 +16,7 @@ public class MarkAsReadCommandHandlerConfigurer implements DialogCommandHandlerC
 	@Override
 	public void configure(
 			CommandHandlerWithReplyBuilder<DialogCommand, DialogEvent, DialogState> commandHandlerBuilder,
-			ActorContext<DialogCommand> actorContext,
-			Supplier<EffectFactories<DialogEvent, DialogState>> effectFactory
+			ActorContext<DialogCommand> actorContext
 	) {
 		var log = actorContext.getLog();
 		commandHandlerBuilder
@@ -28,7 +25,7 @@ public class MarkAsReadCommandHandlerConfigurer implements DialogCommandHandlerC
 					var requester = command.requester();
 					if (state.isParticipantAbsent(requester)) {
 						log.info("Requester {} is not part of dialog...", requester);
-						return effectFactory.get()
+						return new EffectFactories<DialogEvent, DialogState>()
 								.none()
 								.thenReply(command.replyTo(), v -> StatusReply.error("You are not part of conversation"));
 					}
@@ -37,14 +34,14 @@ public class MarkAsReadCommandHandlerConfigurer implements DialogCommandHandlerC
 					if (message.isPresent()) {
 						if (message.get().isReadBy(requester)) {
 							log.info("Message {} already read by {}", message, requester);
-							return effectFactory.get().none().thenReply(command.replyTo(), v -> StatusReply.ack());
+							return new EffectFactories<DialogEvent, DialogState>().none().thenReply(command.replyTo(), v -> StatusReply.ack());
 						}
 						var newEvent = new MessageMarkedAsReadEvent(messageId, requester, command.timestamp());
 						log.info("Persisting marked as read event {}", newEvent);
-						return effectFactory.get().persist(newEvent).thenReply(command.replyTo(), v -> StatusReply.ack());
+						return new EffectFactories<DialogEvent, DialogState>().persist(newEvent).thenReply(command.replyTo(), v -> StatusReply.ack());
 					} else {
 						log.info("Message {} has already been removed", message);
-						return effectFactory.get().none().thenReply(command.replyTo(), v -> StatusReply.ack());
+						return new EffectFactories<DialogEvent, DialogState>().none().thenReply(command.replyTo(), v -> StatusReply.ack());
 					}
 				});
 	}

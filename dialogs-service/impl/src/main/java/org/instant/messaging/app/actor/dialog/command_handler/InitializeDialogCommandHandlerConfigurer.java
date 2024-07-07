@@ -1,7 +1,5 @@
 package org.instant.messaging.app.actor.dialog.command_handler;
 
-import java.util.function.Supplier;
-
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command.InitializeDialogCommand;
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
@@ -19,15 +17,14 @@ public class InitializeDialogCommandHandlerConfigurer implements DialogCommandHa
 	@Override
 	public void configure(
 			CommandHandlerWithReplyBuilder<DialogCommand, DialogEvent, DialogState> commandHandlerBuilder,
-			ActorContext<DialogCommand> actorContext,
-			Supplier<EffectFactories<DialogEvent, DialogState>> effectSupplier
+			ActorContext<DialogCommand> actorContext
 	) {
 		var log = actorContext.getLog();
 		commandHandlerBuilder
 				.forStateType(NotInitializedDialog.class)
 				.onCommand(InitializeDialogCommand.class, (state, command) -> {
 					log.info("Initializing dialog. Command = {}", command);
-					return effectSupplier.get()
+					return new EffectFactories<DialogEvent, DialogState>()
 							.persist(new DialogInitializedEvent(
 									command.requester(),
 									command.otherParticipants(),
