@@ -19,6 +19,10 @@ public record Message(
 		Set<UUID> readers
 ) {
 
+	public boolean isCreatedBy(UUID expectedFrom) {
+		return Objects.equals(from, expectedFrom);
+	}
+
 	public boolean isReadBy(UUID reader) {
 		return readers.contains(reader);
 	}

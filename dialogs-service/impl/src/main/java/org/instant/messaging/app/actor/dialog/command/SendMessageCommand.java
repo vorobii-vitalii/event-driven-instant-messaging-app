@@ -10,6 +10,7 @@ import lombok.Builder;
 
 @Builder
 public record SendMessageCommand(
+		String dialogId,
 		UUID messageId,
 		UUID from,
 		String messageContent,

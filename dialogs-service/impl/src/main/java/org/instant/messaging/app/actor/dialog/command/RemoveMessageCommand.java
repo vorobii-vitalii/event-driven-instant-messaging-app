@@ -10,6 +10,7 @@ import lombok.Builder;
 
 @Builder
 public record RemoveMessageCommand(
+		String dialogId,
 		UUID messageId,
 		UUID requester,
 		Instant timestamp,

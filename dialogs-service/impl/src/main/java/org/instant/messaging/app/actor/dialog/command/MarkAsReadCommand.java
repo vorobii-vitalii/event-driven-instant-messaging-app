@@ -10,6 +10,7 @@ import lombok.Builder;
 
 @Builder
 public record MarkAsReadCommand(
+		String dialogId,
 		UUID messageId,
 		UUID requester,
 		Instant timestamp,

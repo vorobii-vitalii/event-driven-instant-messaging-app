@@ -38,7 +38,7 @@ public class RemoveMessageDialogCommandHandlerConfigurer implements DialogComman
 						log.info("Message {} is currently absent", messageId);
 						return new EffectFactories<DialogEvent, DialogState>().none().thenReply(command.replyTo(), v -> StatusReply.ack());
 					}
-					if (Objects.equals(foundMessage.get().from(), requester)) {
+					if (foundMessage.get().isCreatedBy(requester)) {
 						log.info("{} removed message {}", requester, messageId);
 						return new EffectFactories<DialogEvent, DialogState>()
 								.persist(new MessageRemovedEvent(messageId, command.timestamp()))

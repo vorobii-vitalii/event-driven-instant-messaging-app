@@ -11,6 +11,7 @@ import lombok.Builder;
 
 @Builder
 public record InitializeDialogCommand(
+		String dialogId,
 		UUID requester,
 		List<UUID> otherParticipants,
 		String dialogTopic,

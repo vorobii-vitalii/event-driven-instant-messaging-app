@@ -8,8 +8,11 @@ import org.instant.messaging.app.actor.dialog.event.DialogEvent;
 import org.instant.messaging.app.actor.dialog.event_handler.DialogEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.state.DialogState;
 import org.instant.messaging.app.actor.dialog.state.NotInitializedDialog;
+import org.instant.messaging.app.kafka.DialogEventsProcessorConfig;
 
+import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.ActorContext;
+import akka.cluster.sharding.typed.javadsl.EntityTypeKey;
 import akka.persistence.typed.PersistenceId;
 import akka.persistence.typed.javadsl.CommandHandlerWithReply;
 import akka.persistence.typed.javadsl.EventHandler;
@@ -17,6 +20,8 @@ import akka.persistence.typed.javadsl.EventSourcedBehaviorWithEnforcedReplies;
 import akka.persistence.typed.javadsl.RetentionCriteria;
 
 public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogCommand, DialogEvent, DialogState> {
+	public static final EntityTypeKey<DialogCommand> ENTITY_KEY = EntityTypeKey.create(DialogCommand.class, "Dialog");
+
 	private final RetentionCriteria retentionCriteria;
 	private final ActorContext<DialogCommand> actorContext;
 	private final Collection<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers;
@@ -34,6 +39,18 @@ public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogC
 		this.actorContext = actorContext;
 		this.dialogCommandHandlerConfigurers = dialogCommandHandlerConfigurers;
 		this.dialogEventHandlerConfigurers = dialogEventHandlerConfigurers;
+	}
+
+	public static void init(
+			ActorSystem<?> system,
+			int performSnapshotAfterEvents,
+			Collection<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers,
+			Collection<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers,
+			DialogEventsProcessorConfig eventsProcessorConfig
+	) {
+
+
+
 	}
 
 	@Override
