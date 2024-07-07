@@ -13,15 +13,15 @@ message DialogKafkaMessage {
   UUID commandId = 1;
 
   oneof message {
-    InitializeDialog init_dialog = 2;
-    SendMessage send_message = 3;
-    RemoveMessage remove_message = 4;
-    MarkAsRead mark_as_read = 5;
-    LeaveConversation leave_conversation = 6;
-    EndConversation end_conversation = 7;
+    KafkaInitializeDialog init_dialog = 2;
+    KafkaSendMessage send_message = 3;
+    KafkaRemoveMessage remove_message = 4;
+    KafkaMarkAsRead mark_as_read = 5;
+    KafkaLeaveConversation leave_conversation = 6;
+    KafkaEndConversation end_conversation = 7;
   }
 
-  message InitializeDialog {
+  message KafkaInitializeDialog {
     UUID dialog_id = 1;
     UUID requester = 2;
     repeated UUID participantsToInvite = 3;
@@ -29,7 +29,7 @@ message DialogKafkaMessage {
     int64 timestamp = 5;
   }
 
-  message SendMessage {
+  message KafkaSendMessage {
     UUID message_id = 1;
     UUID dialog_id = 2;
     UUID from = 3;
@@ -37,27 +37,27 @@ message DialogKafkaMessage {
     int64 timestamp = 5;
   }
 
-  message RemoveMessage {
+  message KafkaRemoveMessage {
     UUID message_id = 1;
     UUID dialog_id = 2;
     UUID requester = 3;
     int64 timestamp = 4;
   }
 
-  message MarkAsRead {
+  message KafkaMarkAsRead {
     UUID message_id = 1;
     UUID dialog_id = 2;
     UUID requester = 3;
     int64 timestamp = 4;
   }
 
-  message LeaveConversation {
+  message KafkaLeaveConversation {
     UUID dialogId = 1;
     UUID requester = 2;
     int64 timestamp = 3;
   }
 
-  message EndConversation {
+  message KafkaEndConversation {
     UUID dialog_id = 1;
     UUID requester = 2;
     int64 timestamp = 3;

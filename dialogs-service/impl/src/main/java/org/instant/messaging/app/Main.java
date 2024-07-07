@@ -16,7 +16,7 @@ public class Main {
 	private static Behavior<Object> guardianBehavior() {
 		return Behaviors.setup(context -> {
 
-			DaggerDialogActorComponent.create().dialogCommandHandlerConfigurers();
+			DaggerDialogActorComponent.create();
 
 			return Behaviors.ignore();
 		});
