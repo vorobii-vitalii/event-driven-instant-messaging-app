@@ -1,5 +1,7 @@
 package org.instant.messaging.app;
 
+import org.instant.messaging.app.dependency_injection.components.DaggerDialogActorComponent;
+
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Behaviors;
@@ -14,7 +16,7 @@ public class Main {
 	private static Behavior<Object> guardianBehavior() {
 		return Behaviors.setup(context -> {
 
-
+			DaggerDialogActorComponent.create().dialogCommandHandlerConfigurers();
 
 			return Behaviors.ignore();
 		});

@@ -11,6 +11,7 @@ import org.instant.messaging.app.actor.dialog.state.Message;
 import akka.persistence.typed.javadsl.EventHandlerBuilder;
 
 public class MessageSentEventHandlerConfigurer implements DialogEventHandlerConfigurer {
+
 	@Override
 	public void configure(EventHandlerBuilder<DialogState, DialogEvent> eventHandlerBuilder) {
 		eventHandlerBuilder
@@ -23,4 +24,5 @@ public class MessageSentEventHandlerConfigurer implements DialogEventHandlerConf
 						Set.of()
 				)));
 	}
+
 }

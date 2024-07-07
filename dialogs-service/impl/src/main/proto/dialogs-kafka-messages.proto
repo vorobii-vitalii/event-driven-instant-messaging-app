@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.instant.message.app";
+option java_outer_classname = "DialogsKafkaProto";
+
+package instant_messaging_app;
+
+import "common.proto";
+
+message DialogKafkaMessage {
+
+  UUID commandId = 1;
+
+  oneof message {
+    InitializeDialog init_dialog = 2;
+    SendMessage send_message = 3;
+    RemoveMessage remove_message = 4;
+    MarkAsRead mark_as_read = 5;
+    LeaveConversation leave_conversation = 6;
+    EndConversation end_conversation = 7;
+  }
+
+  message InitializeDialog {
+    UUID dialog_id = 1;
+    UUID requester = 2;
+    repeated UUID participantsToInvite = 3;
+    string dialogTopic = 4;
+    int64 timestamp = 5;
+  }
+
+  message SendMessage {
+    UUID message_id = 1;
+    UUID dialog_id = 2;
+    UUID from = 3;
+    string content = 4;
+    int64 timestamp = 5;
+  }
+
+  message RemoveMessage {
+    UUID message_id = 1;
+    UUID dialog_id = 2;
+    UUID requester = 3;
+    int64 timestamp = 4;
+  }
+
+  message MarkAsRead {
+    UUID message_id = 1;
+    UUID dialog_id = 2;
+    UUID requester = 3;
+    int64 timestamp = 4;
+  }
+
+  message LeaveConversation {
+    UUID dialogId = 1;
+    UUID requester = 2;
+    int64 timestamp = 3;
+  }
+
+  message EndConversation {
+    UUID dialog_id = 1;
+    UUID requester = 2;
+    int64 timestamp = 3;
+  }
+}

@@ -8,10 +8,12 @@ import org.instant.messaging.app.actor.dialog.state.DialogState;
 import akka.persistence.typed.javadsl.EventHandlerBuilder;
 
 public class MessageRemovedEventHandlerConfigurer implements DialogEventHandlerConfigurer {
+
 	@Override
 	public void configure(EventHandlerBuilder<DialogState, DialogEvent> eventHandlerBuilder) {
 		eventHandlerBuilder
 				.forStateType(ActiveDialogState.class)
 				.onEvent(MessageRemovedEvent.class, (state, event) -> state.removeMessage(event.messageId()));
 	}
+
 }

@@ -10,7 +10,7 @@ import org.instant.messaging.app.actor.dialog.command.SendMessageCommand;
 
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record Message(
 		UUID messageId,
 		UUID from,
@@ -26,7 +26,7 @@ public record Message(
 	public Message markAsReadBy(UUID newReadBy) {
 		var newReaders = new HashSet<>(readers);
 		newReaders.add(newReadBy);
-		return new Message(messageId, from, messageContent, timestamp, newReaders);
+		return toBuilder().readers(newReaders).build();
 	}
 
 	public boolean wasCreatedFromCommand(SendMessageCommand command) {

@@ -2,6 +2,7 @@ package org.instant.messaging.app.actor.dialog.state;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -149,6 +150,83 @@ class TestActiveDialogState {
 				.participants(Set.of(createdBy))
 				.build();
 		assertThat(activeDialogState.findMessageById(UUID.randomUUID())).isEmpty();
+	}
+
+	@Test
+	void containsMessageGivenItDoesntExist() {
+		var messageId1 = UUID.randomUUID();
+		var messageId2 = UUID.randomUUID();
+		var message2 = Message.builder()
+				.messageId(messageId2)
+				.messageContent("Content 2")
+				.build();
+		var activeDialogState = ActiveDialogState.builder()
+				.messages(Map.of(messageId2, message2))
+				.build();
+		assertThat(activeDialogState.containsMessage(messageId1)).isFalse();
+	}
+
+	@Test
+	void containsMessageGivenItExists() {
+		var messageId1 = UUID.randomUUID();
+		var messageId2 = UUID.randomUUID();
+		var message1 = Message.builder()
+				.messageContent("Content 1")
+				.build();
+		var message2 = Message.builder()
+				.messageId(messageId2)
+				.messageContent("Content 2")
+				.build();
+		var activeDialogState = ActiveDialogState.builder()
+				.messages(Map.of(
+						messageId1, message1,
+						messageId2, message2
+				))
+				.build();
+		assertThat(activeDialogState.containsMessage(messageId1)).isTrue();
+	}
+
+	@Test
+	void changeMessageByIdGivenMessageNotExistsShouldReturnSameInstance() {
+		var messageId1 = UUID.randomUUID();
+		var messageId2 = UUID.randomUUID();
+		var message2 = Message.builder()
+				.messageId(messageId2)
+				.messageContent("Content 2")
+				.build();
+		var activeDialogState = ActiveDialogState.builder()
+				.messages(Map.of(messageId2, message2))
+				.build();
+		var currentTimestamp = Instant.now();
+		assertThat(activeDialogState.changeMessageById(messageId1, v -> v.toBuilder().timestamp(currentTimestamp).build()))
+				.isSameAs(activeDialogState);
+	}
+
+	@Test
+	void changeMessageByIdGivenMessageExists() {
+		var messageId1 = UUID.randomUUID();
+		var messageId2 = UUID.randomUUID();
+		var message1 = Message.builder()
+				.messageContent("Content 1")
+				.build();
+		var message2 = Message.builder()
+				.messageId(messageId2)
+				.messageContent("Content 2")
+				.build();
+		var activeDialogState = ActiveDialogState.builder()
+				.messages(Map.of(
+						messageId1, message1,
+						messageId2, message2
+				))
+				.build();
+		var currentTimestamp = Instant.now();
+		assertThat(activeDialogState.changeMessageById(messageId1, v -> v.toBuilder().timestamp(currentTimestamp).build()))
+				.isEqualTo(ActiveDialogState.builder()
+						.messages(Map.of(
+								messageId1, Message.builder().messageContent("Content 1").timestamp(currentTimestamp).build(),
+								messageId2, message2
+						))
+						.build());
 	}
 
 }

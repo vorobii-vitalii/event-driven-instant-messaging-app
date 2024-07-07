@@ -8,6 +8,7 @@ import org.instant.messaging.app.actor.dialog.state.DialogState;
 import akka.persistence.typed.javadsl.EventHandlerBuilder;
 
 public class MessageMarkedAsReadEventHandlerConfigurer implements DialogEventHandlerConfigurer {
+
 	@Override
 	public void configure(EventHandlerBuilder<DialogState, DialogEvent> eventHandlerBuilder) {
 		eventHandlerBuilder
@@ -17,4 +18,5 @@ public class MessageMarkedAsReadEventHandlerConfigurer implements DialogEventHan
 						message -> message.markAsReadBy(messageMarkedAsRead.requester())
 				));
 	}
+
 }

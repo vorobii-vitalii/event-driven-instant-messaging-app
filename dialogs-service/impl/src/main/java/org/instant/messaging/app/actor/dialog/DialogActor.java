@@ -1,6 +1,6 @@
 package org.instant.messaging.app.actor.dialog;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command_handler.DialogCommandHandlerConfigurer;
@@ -19,15 +19,15 @@ import akka.persistence.typed.javadsl.RetentionCriteria;
 public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogCommand, DialogEvent, DialogState> {
 	private final RetentionCriteria retentionCriteria;
 	private final ActorContext<DialogCommand> actorContext;
-	private final List<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers;
-	private final List<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers;
+	private final Collection<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers;
+	private final Collection<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers;
 
 	public DialogActor(
 			PersistenceId persistenceId,
 			int performSnapshotAfterEvents,
 			ActorContext<DialogCommand> actorContext,
-			List<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers,
-			List<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers
+			Collection<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers,
+			Collection<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers
 	) {
 		super(persistenceId);
 		this.retentionCriteria = RetentionCriteria.snapshotEvery(performSnapshotAfterEvents);

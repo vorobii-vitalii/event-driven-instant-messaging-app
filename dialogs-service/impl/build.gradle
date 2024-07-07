@@ -103,6 +103,10 @@ dependencies {
 
     testCompileOnly "org.projectlombok:lombok:$LombokVersion"
     testAnnotationProcessor "org.projectlombok:lombok:$LombokVersion"
+
+    // Dependency injection
+    implementation "com.google.dagger:dagger:$DaggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$DaggerVersion"
 }
 
 test {
