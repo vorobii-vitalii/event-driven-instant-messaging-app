@@ -13,6 +13,7 @@ import akka.persistence.typed.javadsl.CommandHandlerWithReplyBuilder;
 import akka.persistence.typed.javadsl.EffectFactories;
 
 public class MarkAsReadCommandHandlerConfigurer implements DialogCommandHandlerConfigurer {
+
 	@Override
 	public void configure(
 			CommandHandlerWithReplyBuilder<DialogCommand, DialogEvent, DialogState> commandHandlerBuilder,
@@ -38,11 +39,16 @@ public class MarkAsReadCommandHandlerConfigurer implements DialogCommandHandlerC
 						}
 						var newEvent = new MessageMarkedAsReadEvent(messageId, requester, command.timestamp());
 						log.info("Persisting marked as read event {}", newEvent);
-						return new EffectFactories<DialogEvent, DialogState>().persist(newEvent).thenReply(command.replyTo(), v -> StatusReply.ack());
+						return new EffectFactories<DialogEvent, DialogState>()
+								.persist(newEvent)
+								.thenReply(command.replyTo(), v -> StatusReply.ack());
 					} else {
 						log.info("Message {} has already been removed", message);
-						return new EffectFactories<DialogEvent, DialogState>().none().thenReply(command.replyTo(), v -> StatusReply.ack());
+						return new EffectFactories<DialogEvent, DialogState>()
+								.none()
+								.thenReply(command.replyTo(), v -> StatusReply.error("Message has been removed"));
 					}
 				});
 	}
+
 }
