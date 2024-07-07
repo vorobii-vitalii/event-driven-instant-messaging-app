@@ -6,7 +6,9 @@ import java.util.UUID;
 import akka.Done;
 import akka.actor.typed.ActorRef;
 import akka.pattern.StatusReply;
+import lombok.Builder;
 
+@Builder
 public record SendMessageCommand(
 		UUID messageId,
 		UUID from,
