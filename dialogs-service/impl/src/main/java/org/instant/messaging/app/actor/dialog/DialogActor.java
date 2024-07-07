@@ -1,22 +1,12 @@
 package org.instant.messaging.app.actor.dialog;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command_handler.DialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
-import org.instant.messaging.app.actor.dialog.event.DialogInitializedEvent;
-import org.instant.messaging.app.actor.dialog.event.MessageMarkedAsReadEvent;
-import org.instant.messaging.app.actor.dialog.event.MessageRemovedEvent;
-import org.instant.messaging.app.actor.dialog.event.MessageSentEvent;
-import org.instant.messaging.app.actor.dialog.state.ActiveDialogState;
-import org.instant.messaging.app.actor.dialog.state.ClosedDialogState;
+import org.instant.messaging.app.actor.dialog.event_handler.DialogEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.state.DialogState;
-import org.instant.messaging.app.actor.dialog.state.Message;
 import org.instant.messaging.app.actor.dialog.state.NotInitializedDialog;
 
 import akka.actor.typed.javadsl.ActorContext;
@@ -30,17 +20,20 @@ public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogC
 	private final RetentionCriteria retentionCriteria;
 	private final ActorContext<DialogCommand> actorContext;
 	private final List<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers;
+	private final List<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers;
 
 	public DialogActor(
 			PersistenceId persistenceId,
 			int performSnapshotAfterEvents,
 			ActorContext<DialogCommand> actorContext,
-			List<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers
+			List<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers,
+			List<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers
 	) {
 		super(persistenceId);
 		this.retentionCriteria = RetentionCriteria.snapshotEvery(performSnapshotAfterEvents);
 		this.actorContext = actorContext;
 		this.dialogCommandHandlerConfigurers = dialogCommandHandlerConfigurers;
+		this.dialogEventHandlerConfigurers = dialogEventHandlerConfigurers;
 	}
 
 	@Override
@@ -63,37 +56,7 @@ public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogC
 	@Override
 	public EventHandler<DialogState, DialogEvent> eventHandler() {
 		var eventHandlerBuilder = newEventHandlerBuilder();
-
-		// Not initialized dialog state event handlers
-		eventHandlerBuilder
-				.forStateType(NotInitializedDialog.class)
-				.onEvent(DialogInitializedEvent.class, (ignoredState, dialogInitialized) -> {
-					Set<UUID> allParticipants = new HashSet<>(dialogInitialized.invitedParticipants());
-					allParticipants.add(dialogInitialized.createdBy());
-					return new ActiveDialogState(
-							dialogInitialized.dialogTopic(),
-							new HashMap<>(),
-							dialogInitialized.createdBy(),
-							allParticipants
-					);
-				});
-
-		// Active dialog state event handlers
-		eventHandlerBuilder
-				.forStateType(ActiveDialogState.class)
-				.onEvent(MessageMarkedAsReadEvent.class, (state, messageMarkedAsRead) -> state.changeMessageById(
-						messageMarkedAsRead.messageId(),
-						message -> message.markAsReadBy(messageMarkedAsRead.requester())
-				))
-				.onEvent(MessageSentEvent.class, (state, event) -> state.addMessage(new Message(
-						event.messageId(),
-						event.from(),
-						event.messageContent(),
-						event.timestamp(),
-						Set.of()
-				)))
-				.onEvent(MessageRemovedEvent.class, (state, event) -> state.removeMessage(event.messageId()));
-
+		dialogEventHandlerConfigurers.forEach(v -> v.configure(eventHandlerBuilder));
 		return eventHandlerBuilder.build();
 	}
 

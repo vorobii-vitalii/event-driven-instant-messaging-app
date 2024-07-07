@@ -1,4 +1,6 @@
 package org.instant.messaging.app.actor.dialog.state;
 
-public interface DialogState {
+import akka.serialization.jackson.JsonSerializable;
+
+public interface DialogState extends JsonSerializable {
 }
