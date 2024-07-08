@@ -1,12 +1,14 @@
 package org.instant.messaging.app.kafka;
 
 import java.util.Collection;
+import java.util.concurrent.CompletionStage;
 
 import org.instant.messaging.app.actor.dialog.DialogActor;
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command_handler.DialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.DialogEventHandlerConfigurer;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.cluster.sharding.external.ExternalShardAllocationStrategy;
@@ -24,12 +26,12 @@ public class DialogEventsProcessorInitializer {
 	private final Collection<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers;
 	private final Collection<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers;
 
-	public void initialize(
+	public CompletionStage<ActorRef<DialogCommand>> initialize(
 			DialogEventsProcessorConfig eventsProcessorConfig,
 			ActorSystem<?> system
 	) {
 		log.info("Going to initialize Kafka sharded dialog events processor. Configuration = {}", eventsProcessorConfig);
-		KafkaClusterSharding.get(system)
+		return KafkaClusterSharding.get(system)
 				.messageExtractorNoEnvelope(
 						eventsProcessorConfig.topic(),
 						eventsProcessorConfig.partitionsFetchTimeout(),
