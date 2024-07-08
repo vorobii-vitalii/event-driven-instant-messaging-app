@@ -1,6 +1,5 @@
 package org.instant.messaging.app.grpc.services;
 
-import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -30,17 +29,96 @@ public class DialogWriteServiceImpl implements DialogWriteService {
 
 	@SneakyThrows
 	@Override
-	public CompletionStage<Acknowledgement> initializeDialog(InitializeDialog in) {
+	public CompletionStage<Acknowledgement> initializeDialog(InitializeDialog initializeDialog) {
+		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
+				.setCommandId(initializeDialog.getCommandId())
+				.setInitDialog(DialogKafkaMessage.KafkaInitializeDialog.newBuilder()
+						.setDialogId(initializeDialog.getDialogId())
+						.setRequester(initializeDialog.getRequester())
+						.addAllParticipantsToInvite(initializeDialog.getParticipantsToInviteList())
+						.setDialogTopic(initializeDialog.getDialogTopic())
+						.setTimestamp(initializeDialog.getTimestamp()))
+				.build();
+		String dialogId = initializeDialog.getDialogId().getValue();
+		return sendMessageToKafka(dialogId, dialogKafkaMessage);
+	}
+
+	@Override
+	public CompletionStage<Acknowledgement> sendMessage(SendMessage in) {
 		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
 				.setCommandId(in.getCommandId())
-				.setInitDialog(DialogKafkaMessage.KafkaInitializeDialog.newBuilder()
+				.setSendMessage(DialogKafkaMessage.KafkaSendMessage.newBuilder()
+						.setDialogId(in.getDialogId())
+						.setContent(in.getContent())
+						.setFrom(in.getFrom())
+						.setMessageId(in.getMessageId())
+						.setTimestamp(in.getTimestamp())
+						.build())
+				.build();
+		String dialogId = in.getDialogId().getValue();
+		return sendMessageToKafka(dialogId, dialogKafkaMessage);
+	}
+
+	@Override
+	public CompletionStage<Acknowledgement> removeMessage(RemoveMessage in) {
+		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
+				.setCommandId(in.getCommandId())
+				.setRemoveMessage(DialogKafkaMessage.KafkaRemoveMessage.newBuilder()
+						.setMessageId(in.getMessageId())
 						.setDialogId(in.getDialogId())
 						.setRequester(in.getRequester())
-						.addAllParticipantsToInvite(in.getParticipantsToInviteList())
-						.setDialogTopic(in.getDialogTopic())
-						.setTimestamp(in.getTimestamp()))
+						.setTimestamp(in.getTimestamp())
+						.build())
 				.build();
-		return sendProducer.send(new ProducerRecord<>(dialogCommandsTopic, in.getDialogId().getValue(), dialogKafkaMessage.toByteArray()))
+		String dialogId = in.getDialogId().getValue();
+		return sendMessageToKafka(dialogId, dialogKafkaMessage);
+	}
+
+	@Override
+	public CompletionStage<Acknowledgement> markAsRead(MarkAsRead in) {
+		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
+				.setCommandId(in.getCommandId())
+				.setMarkAsRead(DialogKafkaMessage.KafkaMarkAsRead.newBuilder()
+						.setMessageId(in.getMessageId())
+						.setDialogId(in.getDialogId())
+						.setRequester(in.getRequester())
+						.setTimestamp(in.getTimestamp())
+						.build())
+				.build();
+		String dialogId = in.getDialogId().getValue();
+		return sendMessageToKafka(dialogId, dialogKafkaMessage);
+	}
+
+	@Override
+	public CompletionStage<Acknowledgement> leaveConversation(LeaveConversation in) {
+		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
+				.setCommandId(in.getCommandId())
+				.setLeaveConversation(DialogKafkaMessage.KafkaLeaveConversation.newBuilder()
+						.setDialogId(in.getDialogId())
+						.setRequester(in.getRequester())
+						.setTimestamp(in.getTimestamp())
+						.build())
+				.build();
+		String dialogId = in.getDialogId().getValue();
+		return sendMessageToKafka(dialogId, dialogKafkaMessage);
+	}
+
+	@Override
+	public CompletionStage<Acknowledgement> endConversation(EndConversation in) {
+		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
+				.setCommandId(in.getCommandId())
+				.setEndConversation(DialogKafkaMessage.KafkaEndConversation.newBuilder()
+						.setDialogId(in.getDialogId())
+						.setRequester(in.getRequester())
+						.setTimestamp(in.getTimestamp())
+						.build())
+				.build();
+		String dialogId = in.getDialogId().getValue();
+		return sendMessageToKafka(dialogId, dialogKafkaMessage);
+	}
+
+	private CompletionStage<Acknowledgement> sendMessageToKafka(String dialogId, DialogKafkaMessage dialogKafkaMessage) {
+		return sendProducer.send(new ProducerRecord<>(dialogCommandsTopic, dialogId, dialogKafkaMessage.toByteArray()))
 				.thenApply(recordMetadata -> {
 					log.info("Record metadata = {}", recordMetadata);
 					return Acknowledgement.newBuilder().setSuccess(true).build();
@@ -51,28 +129,4 @@ public class DialogWriteServiceImpl implements DialogWriteService {
 				});
 	}
 
-	@Override
-	public CompletionStage<Acknowledgement> sendMessage(SendMessage in) {
-		return null;
-	}
-
-	@Override
-	public CompletionStage<Acknowledgement> removeMessage(RemoveMessage in) {
-		return null;
-	}
-
-	@Override
-	public CompletionStage<Acknowledgement> markAsRead(MarkAsRead in) {
-		return null;
-	}
-
-	@Override
-	public CompletionStage<Acknowledgement> leaveConversation(LeaveConversation in) {
-		return null;
-	}
-
-	@Override
-	public CompletionStage<Acknowledgement> endConversation(EndConversation in) {
-		return null;
-	}
 }

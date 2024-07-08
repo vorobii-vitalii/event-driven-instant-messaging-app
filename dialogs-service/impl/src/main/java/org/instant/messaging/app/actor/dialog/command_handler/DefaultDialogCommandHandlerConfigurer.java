@@ -10,6 +10,7 @@ import akka.persistence.typed.javadsl.CommandHandlerWithReplyBuilder;
 import akka.persistence.typed.javadsl.EffectFactories;
 
 public class DefaultDialogCommandHandlerConfigurer implements DialogCommandHandlerConfigurer {
+
 	@Override
 	public void configure(
 			CommandHandlerWithReplyBuilder<DialogCommand, DialogEvent, DialogState> commandHandlerBuilder,
@@ -30,4 +31,5 @@ public class DefaultDialogCommandHandlerConfigurer implements DialogCommandHandl
 	public int getPriority() {
 		return 1;
 	}
+
 }
