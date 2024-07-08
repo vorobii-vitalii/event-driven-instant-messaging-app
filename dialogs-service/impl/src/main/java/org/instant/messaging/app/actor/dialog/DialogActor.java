@@ -1,6 +1,7 @@
 package org.instant.messaging.app.actor.dialog;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command_handler.DialogCommandHandlerConfigurer;
@@ -66,7 +67,10 @@ public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogC
 	@Override
 	public CommandHandlerWithReply<DialogCommand, DialogEvent, DialogState> commandHandler() {
 		var commandHandlerBuilder = newCommandHandlerWithReplyBuilder();
-		dialogCommandHandlerConfigurers.forEach(configurer -> configurer.configure(commandHandlerBuilder, actorContext));
+		dialogCommandHandlerConfigurers
+				.stream()
+				.sorted(Comparator.comparingInt(DialogCommandHandlerConfigurer::getPriority))
+				.forEach(configurer -> configurer.configure(commandHandlerBuilder, actorContext));
 		return commandHandlerBuilder.build();
 	}
 

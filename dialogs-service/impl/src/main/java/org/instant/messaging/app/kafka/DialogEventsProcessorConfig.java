@@ -3,6 +3,7 @@ package org.instant.messaging.app.kafka;
 import java.time.Duration;
 import java.util.Map;
 
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import akka.actor.typed.ActorSystem;
@@ -20,8 +21,8 @@ public record DialogEventsProcessorConfig(
 		int performSnapshotsAfterEvents
 ) {
 
-	public ConsumerSettings<String, String> getConsumerSettings() {
-		return ConsumerSettings.apply(actorSystem, new StringDeserializer(), new StringDeserializer())
+	public ConsumerSettings<String, byte[]> getConsumerSettings() {
+		return ConsumerSettings.apply(actorSystem, new StringDeserializer(), new ByteArrayDeserializer())
 				.withBootstrapServers(bootstrapServers)
 				.withGroupId(groupId)
 				.withProperties(kafkaProperties);

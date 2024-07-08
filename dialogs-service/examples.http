@@ -1,0 +1,19 @@
+##
+##
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/initializeDialog
+
+{
+  "commandId": {
+    "value": "58aa838a-94d6-46e7-ac24-1c22b5c03607"
+  },
+  "dialog_id": {
+    "value": "58aa838a-94d6-46e7-ac24-1c22b5c03607"
+  },
+  "dialogTopic": "Dialog 1",
+  "participantsToInvite": [],
+  "requester": {
+    "value": "58aa838a-94d6-46e7-ac24-1c22b5c03607"
+  },
+  "timestamp": "12323452242"
+}
+

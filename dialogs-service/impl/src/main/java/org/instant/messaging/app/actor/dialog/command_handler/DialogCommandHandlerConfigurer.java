@@ -6,4 +6,7 @@ import org.instant.messaging.app.actor.dialog.event.DialogEvent;
 import org.instant.messaging.app.actor.dialog.state.DialogState;
 
 public interface DialogCommandHandlerConfigurer extends CommandHandlerConfigurer<DialogCommand, DialogEvent, DialogState> {
+	default int getPriority() {
+		return 0;
+	}
 }

@@ -1,5 +1,6 @@
 package org.instant.messaging.app.dependency_injection.modules;
 
+import org.instant.messaging.app.actor.dialog.command_handler.DefaultDialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.DialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.InitializeDialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.MarkAsReadCommandHandlerConfigurer;
@@ -12,6 +13,12 @@ import dagger.multibindings.IntoSet;
 
 @Module
 public class DialogCommandHandlerModule {
+
+	@Provides
+	@IntoSet
+	DialogCommandHandlerConfigurer defaultCommandHandlerConfigurer() {
+		return new DefaultDialogCommandHandlerConfigurer();
+	}
 
 	@Provides
 	@IntoSet
