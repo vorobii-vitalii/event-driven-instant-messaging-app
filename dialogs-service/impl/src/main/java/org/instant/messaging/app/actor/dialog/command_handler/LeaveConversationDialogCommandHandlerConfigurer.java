@@ -12,7 +12,6 @@ import akka.pattern.StatusReply;
 import akka.persistence.typed.javadsl.CommandHandlerWithReplyBuilder;
 import akka.persistence.typed.javadsl.EffectFactories;
 
-// TODO: Register
 public class LeaveConversationDialogCommandHandlerConfigurer implements DialogCommandHandlerConfigurer {
 
 	@Override
@@ -31,12 +30,6 @@ public class LeaveConversationDialogCommandHandlerConfigurer implements DialogCo
 								.none()
 								.thenReply(command.replyTo(), v -> StatusReply.ack());
 					}
-//					if (state.isLeader(requester)) {
-//						log.info("Creator of dialog decided to leave");
-//						if (state.getParticipantsCount() == 1) {
-//							log.info("Leader was last participant. Closing dialog");
-//						}
-//					}
 					log.info("Participant {} leaving conversation", requester);
 					return new EffectFactories<DialogEvent, DialogState>()
 							.persist(new ParticipantLeftEvent(requester, command.timestamp()))
