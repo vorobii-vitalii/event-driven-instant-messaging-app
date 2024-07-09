@@ -36,7 +36,9 @@ public class SendMessageCommandHandlerConfigurer implements DialogCommandHandler
 						log.info("Dialog already contains message by id = {}", messageId);
 						if (foundMessage.get().wasCreatedFromCommand(command)) {
 							log.info("Message was created from same command. Sending acknowledgement!");
-							return new EffectFactories<DialogEvent, DialogState>().none().thenReply(command.replyTo(), v -> StatusReply.ack());
+							return new EffectFactories<DialogEvent, DialogState>()
+									.none()
+									.thenReply(command.replyTo(), v -> StatusReply.ack());
 						}
 						log.warn("Message was created from different command. Sending error!");
 						return new EffectFactories<DialogEvent, DialogState>()

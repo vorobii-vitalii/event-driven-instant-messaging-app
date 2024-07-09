@@ -13,8 +13,9 @@ import org.instant.message.app.MarkAsRead;
 import org.instant.message.app.RemoveMessage;
 import org.instant.message.app.SendMessage;
 
+import com.google.protobuf.TextFormat;
+
 import akka.kafka.javadsl.SendProducer;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,7 +28,6 @@ public class DialogWriteServiceImpl implements DialogWriteService {
 		this.dialogCommandsTopic = dialogCommandsTopic;
 	}
 
-	@SneakyThrows
 	@Override
 	public CompletionStage<Acknowledgement> initializeDialog(InitializeDialog initializeDialog) {
 		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
@@ -118,6 +118,11 @@ public class DialogWriteServiceImpl implements DialogWriteService {
 	}
 
 	private CompletionStage<Acknowledgement> sendMessageToKafka(String dialogId, DialogKafkaMessage dialogKafkaMessage) {
+		log.info("Sending message {} with key = {} to Kafka topic = {}",
+				TextFormat.shortDebugString(dialogKafkaMessage),
+				dialogId,
+				dialogCommandsTopic
+		);
 		return sendProducer.send(new ProducerRecord<>(dialogCommandsTopic, dialogId, dialogKafkaMessage.toByteArray()))
 				.thenApply(recordMetadata -> {
 					log.info("Record metadata = {}", recordMetadata);

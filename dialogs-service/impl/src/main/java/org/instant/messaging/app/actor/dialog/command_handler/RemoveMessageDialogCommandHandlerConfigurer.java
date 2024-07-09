@@ -1,7 +1,5 @@
 package org.instant.messaging.app.actor.dialog.command_handler;
 
-import java.util.Objects;
-
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command.RemoveMessageCommand;
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
