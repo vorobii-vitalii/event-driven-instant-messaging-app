@@ -28,7 +28,7 @@ public record ActiveDialogState(
 	}
 
 	public boolean isLeader(UUID requester) {
-		return Objects.equals(requester, createdBy);
+		return Objects.equals(requester, leader);
 	}
 
 	public ActiveDialogState updateLeader(UUID newLeader) {
