@@ -1,9 +1,8 @@
 package org.instant.messaging.app;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import org.instant.message.app.DialogKafkaMessage;
@@ -12,8 +11,6 @@ import org.instant.message.app.DialogReadServiceHandlerFactory;
 import org.instant.message.app.DialogWriteService;
 import org.instant.message.app.DialogWriteServiceHandlerFactory;
 import org.instant.messaging.app.actor.dialog.DialogActor;
-import org.instant.messaging.app.actor.dialog.command.DialogCommand;
-import org.instant.messaging.app.actor.dialog.command.InitializeDialogCommand;
 import org.instant.messaging.app.dependency_injection.components.DaggerDialogEventsProcessorComponent;
 import org.instant.messaging.app.grpc.config.DialogGrpcServiceConfigReader;
 import org.instant.messaging.app.grpc.services.DialogReadServiceImpl;
@@ -24,7 +21,6 @@ import org.instant.messaging.app.kafka.KafkaProducerSettingsReader;
 import com.typesafe.config.ConfigFactory;
 
 import akka.Done;
-import akka.actor.typed.ActorRef;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Adapter;
@@ -74,7 +70,10 @@ public class Main {
 
 			var dialogEventsProcessorConfig = new DialogEventsProcessorConfigReader().readConfig(config, system);
 
-			DaggerDialogEventsProcessorComponent.create()
+			var eventsProcessorComponent = DaggerDialogEventsProcessorComponent.create();
+			var messageAdapter = eventsProcessorComponent.dialogKafkaMessageAdapter();
+
+			eventsProcessorComponent
 					.dialogEventsProcessorInitializer()
 					.initialize(dialogEventsProcessorConfig, system)
 					.thenAccept(dialogCommandActorRef -> {
@@ -88,15 +87,21 @@ public class Main {
 									var record = committableMessage.record();
 									log.info("Consuming record = {}", record);
 									var dialogKafkaMessage = DialogKafkaMessage.parseFrom(record.value());
-									return AskPattern.ask(
+									if (!messageAdapter.isSupported(dialogKafkaMessage)) {
+										log.warn("Message {} cannot converted to command...", dialogKafkaMessage);
+										return CompletableFuture.completedFuture(committableMessage.committableOffset());
+									}
+									CompletionStage<StatusReply<Done>> askReply =
+											AskPattern.ask(
 													dialogCommandActorRef,
-													(ActorRef<StatusReply<Done>> ref) -> toCommand(dialogKafkaMessage, ref),
+													ref -> messageAdapter.adaptMessage(dialogKafkaMessage, ref).orElseThrow(),
 													PROCESSING_TIMEOUT,
-													system.scheduler())
-											.thenApply(v -> {
-												log.info("Processing res = {}. Committing offset", v);
-												return committableMessage.committableOffset();
-											});
+													system.scheduler()
+											);
+									return askReply.thenApply(v -> {
+										log.info("Processing res = {}. Committing offset", v);
+										return committableMessage.committableOffset();
+									});
 								})
 								.toMat(Committer.sink(committerSettings.withMaxBatch(1)), Consumer::createDrainingControl)
 								.run(system);
@@ -104,27 +109,6 @@ public class Main {
 
 			return Behaviors.ignore();
 		});
-	}
-
-	private static DialogCommand toCommand(DialogKafkaMessage dialogKafkaMessage, ActorRef<StatusReply<Done>> replyAcceptor) {
-		switch (dialogKafkaMessage.getMessageCase()) {
-			case INIT_DIALOG -> {
-				var initDialog = dialogKafkaMessage.getInitDialog();
-				return InitializeDialogCommand.builder()
-						.replyTo(replyAcceptor)
-						.initializedAt(Instant.ofEpochMilli(initDialog.getTimestamp()))
-						.dialogTopic(initDialog.getDialogTopic())
-						.otherParticipants(
-								initDialog.getParticipantsToInviteList()
-										.stream()
-										.map(v -> UUID.fromString(v.getValue()))
-										.toList())
-						.requester(UUID.fromString(initDialog.getRequester().getValue()))
-						.dialogId(initDialog.getDialogId().getValue())
-						.build();
-			}
-			default -> throw new IllegalStateException();
-		}
 	}
 
 	private static void startGrpcServer(ActorSystem<?> system) {
