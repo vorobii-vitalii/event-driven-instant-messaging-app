@@ -5,6 +5,7 @@ import org.instant.messaging.app.actor.dialog.event_handler.DialogInitializedEve
 import org.instant.messaging.app.actor.dialog.event_handler.MessageMarkedAsReadEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.MessageRemovedEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.MessageSentEventHandlerConfigurer;
+import org.instant.messaging.app.actor.dialog.event_handler.ParticipantLeftEventHandlerConfigurer;
 
 import dagger.Module;
 import dagger.Provides;
@@ -35,6 +36,12 @@ public class DialogEventHandlerModule {
 	@IntoSet
 	DialogEventHandlerConfigurer messageSentEventHandlerConfigurer() {
 		return new MessageSentEventHandlerConfigurer();
+	}
+
+	@Provides
+	@IntoSet
+	DialogEventHandlerConfigurer participantLeftEventHandlerConfigurer() {
+		return new ParticipantLeftEventHandlerConfigurer();
 	}
 
 }

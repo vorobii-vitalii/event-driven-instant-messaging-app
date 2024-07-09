@@ -3,6 +3,7 @@ package org.instant.messaging.app.dependency_injection.modules;
 import org.instant.messaging.app.actor.dialog.command_handler.DefaultDialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.DialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.InitializeDialogCommandHandlerConfigurer;
+import org.instant.messaging.app.actor.dialog.command_handler.LeaveConversationDialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.MarkAsReadCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.RemoveMessageDialogCommandHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.command_handler.SendMessageCommandHandlerConfigurer;
@@ -36,6 +37,12 @@ public class DialogCommandHandlerModule {
 	@Provides
 	DialogCommandHandlerConfigurer removeMessageDialogCommandHandlerConfigurer() {
 		return new RemoveMessageDialogCommandHandlerConfigurer();
+	}
+
+	@IntoSet
+	@Provides
+	DialogCommandHandlerConfigurer leaveConversationDialogCommandHandlerConfigurer() {
+		return new LeaveConversationDialogCommandHandlerConfigurer();
 	}
 
 	@IntoSet

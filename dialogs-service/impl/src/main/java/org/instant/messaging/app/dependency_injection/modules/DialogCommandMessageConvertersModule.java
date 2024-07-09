@@ -6,7 +6,6 @@ import org.instant.message.app.DialogKafkaMessage;
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.message.adapter.MessageAdapter;
 import org.instant.messaging.app.message.adapter.dialog.DialogCommandMessageConverter;
-import org.instant.messaging.app.message.adapter.dialog.EndConversationMessageDialogCommandMessageConverter;
 import org.instant.messaging.app.message.adapter.dialog.InitDialogCommandMessageConverter;
 import org.instant.messaging.app.message.adapter.dialog.LeaveConversationMessageDialogCommandMessageConverter;
 import org.instant.messaging.app.message.adapter.dialog.MarkAsReadMessageDialogCommandMessageConverter;
@@ -23,12 +22,6 @@ import dagger.multibindings.IntoSet;
 
 @Module
 public class DialogCommandMessageConvertersModule {
-
-	@Provides
-	@IntoSet
-	DialogCommandMessageConverter endConversationMessageDialogCommandMessageConverter() {
-		return new EndConversationMessageDialogCommandMessageConverter();
-	}
 
 	@Provides
 	@IntoSet

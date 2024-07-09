@@ -18,7 +18,6 @@ message DialogKafkaMessage {
     KafkaRemoveMessage remove_message = 4;
     KafkaMarkAsRead mark_as_read = 5;
     KafkaLeaveConversation leave_conversation = 6;
-    KafkaEndConversation end_conversation = 7;
   }
 
   message KafkaInitializeDialog {
@@ -53,12 +52,6 @@ message DialogKafkaMessage {
 
   message KafkaLeaveConversation {
     UUID dialogId = 1;
-    UUID requester = 2;
-    int64 timestamp = 3;
-  }
-
-  message KafkaEndConversation {
-    UUID dialog_id = 1;
     UUID requester = 2;
     int64 timestamp = 3;
   }

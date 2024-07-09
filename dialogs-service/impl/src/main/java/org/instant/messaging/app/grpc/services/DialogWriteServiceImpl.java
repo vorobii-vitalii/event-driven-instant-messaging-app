@@ -6,7 +6,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.instant.message.app.Acknowledgement;
 import org.instant.message.app.DialogKafkaMessage;
 import org.instant.message.app.DialogWriteService;
-import org.instant.message.app.EndConversation;
 import org.instant.message.app.InitializeDialog;
 import org.instant.message.app.LeaveConversation;
 import org.instant.message.app.MarkAsRead;
@@ -94,20 +93,6 @@ public class DialogWriteServiceImpl implements DialogWriteService {
 		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
 				.setCommandId(in.getCommandId())
 				.setLeaveConversation(DialogKafkaMessage.KafkaLeaveConversation.newBuilder()
-						.setDialogId(in.getDialogId())
-						.setRequester(in.getRequester())
-						.setTimestamp(in.getTimestamp())
-						.build())
-				.build();
-		String dialogId = in.getDialogId().getValue();
-		return sendMessageToKafka(dialogId, dialogKafkaMessage);
-	}
-
-	@Override
-	public CompletionStage<Acknowledgement> endConversation(EndConversation in) {
-		DialogKafkaMessage dialogKafkaMessage = DialogKafkaMessage.newBuilder()
-				.setCommandId(in.getCommandId())
-				.setEndConversation(DialogKafkaMessage.KafkaEndConversation.newBuilder()
 						.setDialogId(in.getDialogId())
 						.setRequester(in.getRequester())
 						.setTimestamp(in.getTimestamp())

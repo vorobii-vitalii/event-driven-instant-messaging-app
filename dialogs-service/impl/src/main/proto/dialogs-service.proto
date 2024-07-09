@@ -51,13 +51,6 @@ message LeaveConversation {
   int64 timestamp = 4;
 }
 
-message EndConversation {
-  UUID commandId = 1;
-  UUID dialog_id = 2;
-  UUID requester = 3;
-  int64 timestamp = 4;
-}
-
 // Queries
 message FetchDialogQuery {
   UUID dialog_id = 1;
@@ -83,7 +76,6 @@ service DialogWriteService {
   rpc removeMessage(RemoveMessage) returns (Acknowledgement) {}
   rpc markAsRead(MarkAsRead) returns (Acknowledgement) {}
   rpc leaveConversation(LeaveConversation) returns (Acknowledgement) {}
-  rpc endConversation(EndConversation) returns (Acknowledgement) {}
 }
 
 service DialogReadService {

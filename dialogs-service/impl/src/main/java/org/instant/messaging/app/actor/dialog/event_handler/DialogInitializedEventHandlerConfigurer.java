@@ -26,6 +26,7 @@ public class DialogInitializedEventHandlerConfigurer implements DialogEventHandl
 							dialogInitialized.dialogTopic(),
 							new HashMap<>(),
 							dialogInitialized.createdBy(),
+							dialogInitialized.createdBy(),
 							allParticipants
 					);
 				});
