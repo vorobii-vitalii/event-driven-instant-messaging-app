@@ -6,5 +6,5 @@ import akka.Done;
 import akka.projection.r2dbc.javadsl.R2dbcSession;
 
 public interface ProjectionEventHandler<E> {
-	CompletionStage<Done> handleEvent(E event, R2dbcSession session);
+	CompletionStage<Done> handleEvent(E event, String entityId, R2dbcSession session);
 }

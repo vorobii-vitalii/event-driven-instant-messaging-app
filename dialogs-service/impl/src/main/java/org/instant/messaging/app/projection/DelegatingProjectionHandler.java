@@ -82,14 +82,14 @@ public class DelegatingProjectionHandler<EventType> extends R2dbcHandler<EventEn
 		Optional<R2dbcProjectionSettings> settings = Optional.empty();
 		ProjectionId projectionId = ProjectionId.of(projectionName, slice);
 		Supplier<R2dbcHandler<EventEnvelope<T>>> handlerSupplier = () -> new DelegatingProjectionHandler<>(projectionEventHandler);
-		return R2dbcProjection.atLeastOnce(projectionId, settings, sourceProvider, handlerSupplier, system);
+		return R2dbcProjection.exactlyOnce(projectionId, settings, sourceProvider, handlerSupplier, system);
 	}
 
 	@Override
 	public CompletionStage<Done> process(R2dbcSession session, EventEnvelope<EventType> eventEnvelope) {
 		log.info("Processing event {}", eventEnvelope);
 		EventType event = eventEnvelope.getEvent();
-		return projectionEventHandler.handleEvent(event, session);
+		return projectionEventHandler.handleEvent(event, eventEnvelope.persistenceId(), session);
 	}
 
 }
