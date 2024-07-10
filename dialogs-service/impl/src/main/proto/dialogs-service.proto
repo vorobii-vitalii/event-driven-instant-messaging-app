@@ -54,12 +54,12 @@ message LeaveConversation {
 // Queries
 message FetchDialogQuery {
   UUID dialog_id = 1;
-  UUID requester = 2;
 }
 
 message FetchDialogResponse {
-  repeated DialogMessage messages = 1;
-  repeated UUID participants = 2;
+  string dialog_topic = 1;
+  repeated DialogMessage messages = 2;
+  repeated UUID participants = 3;
 
   message DialogMessage {
     UUID message_id = 1;
