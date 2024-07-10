@@ -6,13 +6,11 @@ import java.util.UUID;
 import org.instant.message.app.DialogKafkaMessage;
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.actor.dialog.command.MarkAsReadCommand;
-import org.instant.messaging.app.actor.dialog.command.RemoveMessageCommand;
 
 import akka.Done;
 import akka.actor.typed.ActorRef;
 import akka.pattern.StatusReply;
 
-// TODO: Register
 public class MarkAsReadMessageDialogCommandMessageConverter implements DialogCommandMessageConverter {
 	@Override
 	public boolean canHandle(DialogKafkaMessage msg) {

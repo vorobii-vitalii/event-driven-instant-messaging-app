@@ -11,8 +11,8 @@ import akka.Done;
 import akka.actor.typed.ActorRef;
 import akka.pattern.StatusReply;
 
-// TODO: Register
 public class RemoveMessageDialogCommandMessageConverter implements DialogCommandMessageConverter {
+
 	@Override
 	public boolean canHandle(DialogKafkaMessage msg) {
 		return msg.getMessageCase() == DialogKafkaMessage.MessageCase.REMOVE_MESSAGE;
@@ -29,4 +29,5 @@ public class RemoveMessageDialogCommandMessageConverter implements DialogCommand
 				.replyTo(context)
 				.build();
 	}
+
 }

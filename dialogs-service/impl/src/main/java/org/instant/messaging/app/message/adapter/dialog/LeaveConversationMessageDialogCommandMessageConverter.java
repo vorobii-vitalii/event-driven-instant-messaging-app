@@ -11,7 +11,6 @@ import akka.Done;
 import akka.actor.typed.ActorRef;
 import akka.pattern.StatusReply;
 
-// TODO: Register
 public class LeaveConversationMessageDialogCommandMessageConverter implements DialogCommandMessageConverter {
 	@Override
 	public boolean canHandle(DialogKafkaMessage msg) {
