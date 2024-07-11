@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Supplier;
 
+import org.instant.messaging.app.projection.impl.EntityIdExtractorImpl;
+
 import akka.Done;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
@@ -28,9 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DelegatingProjectionHandler<EventType> extends R2dbcHandler<EventEnvelope<EventType>> {
 	private final ProjectionEventHandler<EventType> projectionEventHandler;
+	private final EntityIdExtractor entityIdExtractor;
 
-	public DelegatingProjectionHandler(ProjectionEventHandler<EventType> projectionEventHandler) {
+	public DelegatingProjectionHandler(ProjectionEventHandler<EventType> projectionEventHandler, EntityIdExtractor entityIdExtractor) {
 		this.projectionEventHandler = projectionEventHandler;
+		this.entityIdExtractor = entityIdExtractor;
 	}
 
 	public static <T> void initProjectionProcess(
@@ -81,7 +85,8 @@ public class DelegatingProjectionHandler<EventType> extends R2dbcHandler<EventEn
 		log.info("Creating projection {} for slice {}", projectionName, slice);
 		Optional<R2dbcProjectionSettings> settings = Optional.empty();
 		ProjectionId projectionId = ProjectionId.of(projectionName, slice);
-		Supplier<R2dbcHandler<EventEnvelope<T>>> handlerSupplier = () -> new DelegatingProjectionHandler<>(projectionEventHandler);
+		Supplier<R2dbcHandler<EventEnvelope<T>>> handlerSupplier =
+				() -> new DelegatingProjectionHandler<>(projectionEventHandler, new EntityIdExtractorImpl());
 		return R2dbcProjection.exactlyOnce(projectionId, settings, sourceProvider, handlerSupplier, system);
 	}
 
@@ -89,7 +94,7 @@ public class DelegatingProjectionHandler<EventType> extends R2dbcHandler<EventEn
 	public CompletionStage<Done> process(R2dbcSession session, EventEnvelope<EventType> eventEnvelope) {
 		log.info("Processing event {}", eventEnvelope);
 		EventType event = eventEnvelope.getEvent();
-		return projectionEventHandler.handleEvent(event, eventEnvelope.persistenceId().split("\\|")[1], session);
+		return projectionEventHandler.handleEvent(event, entityIdExtractor.extractEntityId(eventEnvelope.persistenceId()), session);
 	}
 
 }
