@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./dialogs-service
+        working-directory: ./dialogs-service/impl
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
