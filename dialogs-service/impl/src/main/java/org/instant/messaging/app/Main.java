@@ -11,6 +11,7 @@ import org.instant.message.app.DialogReadServiceHandlerFactory;
 import org.instant.message.app.DialogWriteService;
 import org.instant.message.app.DialogWriteServiceHandlerFactory;
 import org.instant.messaging.app.actor.dialog.DialogActor;
+import org.instant.messaging.app.actor.dialog.command.DialogCommand;
 import org.instant.messaging.app.dependency_injection.components.DaggerDialogEventsProcessorComponent;
 import org.instant.messaging.app.dependency_injection.components.DaggerDialogEventsProjectionComponent;
 import org.instant.messaging.app.grpc.config.DialogGrpcServiceConfigReader;
@@ -94,6 +95,7 @@ public class Main {
 								var record = committableMessage.record();
 								log.info("Consuming record = {}", record);
 								var dialogKafkaMessage = DialogKafkaMessage.parseFrom(record.value());
+								log.info("Dialog kafka message = {}", dialogKafkaMessage);
 								if (!messageAdapter.isSupported(dialogKafkaMessage)) {
 									log.warn("Message {} cannot converted to command...", dialogKafkaMessage);
 									return CompletableFuture.completedFuture(committableMessage.committableOffset());
@@ -101,7 +103,11 @@ public class Main {
 								CompletionStage<StatusReply<Done>> askReply =
 										AskPattern.ask(
 												dialogCommandActorRef,
-												ref -> messageAdapter.adaptMessage(dialogKafkaMessage, ref).orElseThrow(),
+												ref -> {
+													var command = messageAdapter.adaptMessage(dialogKafkaMessage, ref).orElseThrow();
+													log.info("Converter to command = {}", command);
+													return command;
+												},
 												PROCESSING_TIMEOUT,
 												system.scheduler()
 										);

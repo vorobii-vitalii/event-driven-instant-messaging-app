@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.instant.message.app.DialogKafkaMessage;
 import org.instant.messaging.app.actor.dialog.command.DialogCommand;
+import org.instant.messaging.app.actor.dialog.command.LeaveConversationCommand;
 import org.instant.messaging.app.actor.dialog.command.MarkAsReadCommand;
 
 import akka.Done;
@@ -20,7 +21,7 @@ public class LeaveConversationMessageDialogCommandMessageConverter implements Di
 	@Override
 	public DialogCommand convert(DialogKafkaMessage msg, ActorRef<StatusReply<Done>> context) {
 		DialogKafkaMessage.KafkaLeaveConversation leaveConversation = msg.getLeaveConversation();
-		return MarkAsReadCommand.builder()
+		return LeaveConversationCommand.builder()
 				.dialogId(leaveConversation.getDialogId().getValue())
 				.requester(UUID.fromString(leaveConversation.getRequester().getValue()))
 				.timestamp(Instant.ofEpochMilli(leaveConversation.getTimestamp()))

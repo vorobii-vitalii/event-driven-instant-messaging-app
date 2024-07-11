@@ -60,6 +60,15 @@ GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/initializeDialog
 }
 
 ###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
 GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/sendMessage
 
 {
@@ -77,6 +86,56 @@ GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/sendMessage
     "value": "2a178f4c-b42e-4d9b-a07d-c1b27e128f0a"
   },
   "timestamp": "12323452242"
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC localhost:8080/instant_messaging_app.DialogWriteService/leaveConversation
+
+{
+  "commandId": {
+    "value": "2bec87a1-42e8-4a1d-8211-10f2b91d0e1a"
+  },
+  "timestamp": "12323452212",
+  "requester": {
+    "value": "c8d6a1fe-f20e-4d13-871c-1027b38dcef9"
+  },
+  "dialogId": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC localhost:8080/instant_messaging_app.DialogWriteService/leaveConversation
+
+{
+  "commandId": {
+    "value": "2bec87a1-42e8-4a1d-8211-10f2b91d0e1b"
+  },
+  "timestamp": "12323452215",
+  "requester": {
+    "value": "01a2e47b-a13d-48b8-a909-b218e1d23f0a"
+  },
+  "dialogId": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
 }
 
 ###
