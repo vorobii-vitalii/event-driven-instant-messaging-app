@@ -1,6 +1,5 @@
 package org.instant.messaging.app.grpc.services;
 
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletionStage;
 
 import org.instant.message.app.DialogReadService;
@@ -9,18 +8,17 @@ import org.instant.message.app.FetchDialogResponse;
 import org.instant.message.app.UUID;
 import org.instant.messaging.app.dao.DialogRepository;
 import org.instant.messaging.app.domain.DialogMessage;
+import org.instant.messaging.app.r2dbc.R2dbcSessionExecutor;
 
-import akka.actor.typed.ActorSystem;
-import akka.projection.r2dbc.javadsl.R2dbcSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DialogReadServiceImpl implements DialogReadService {
-	private final ActorSystem<?> actorSystem;
+	private final R2dbcSessionExecutor r2dbcSessionExecutor;
 	private final DialogRepository dialogRepository;
 
-	public DialogReadServiceImpl(ActorSystem<?> actorSystem, DialogRepository dialogRepository) {
-		this.actorSystem = actorSystem;
+	public DialogReadServiceImpl(R2dbcSessionExecutor r2dbcSessionExecutor, DialogRepository dialogRepository) {
+		this.r2dbcSessionExecutor = r2dbcSessionExecutor;
 		this.dialogRepository = dialogRepository;
 	}
 
@@ -28,9 +26,7 @@ public class DialogReadServiceImpl implements DialogReadService {
 	public CompletionStage<FetchDialogResponse> fetchDialog(FetchDialogQuery in) {
 		var dialogId = in.getDialogId().getValue();
 		log.info("Fetching dialog with id = {}", dialogId);
-		return R2dbcSession.withSession(actorSystem, session -> {
-					return dialogRepository.fetchDialogDetails(session, dialogId);
-				})
+		return r2dbcSessionExecutor.execute(session -> dialogRepository.fetchDialogDetails(session, dialogId))
 				.thenApply(v -> {
 					log.info("Mapping dialog details {}", v);
 					return FetchDialogResponse.newBuilder()

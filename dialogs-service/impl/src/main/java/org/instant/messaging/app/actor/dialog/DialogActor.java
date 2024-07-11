@@ -9,9 +9,7 @@ import org.instant.messaging.app.actor.dialog.event.DialogEvent;
 import org.instant.messaging.app.actor.dialog.event_handler.DialogEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.state.DialogState;
 import org.instant.messaging.app.actor.dialog.state.NotInitializedDialog;
-import org.instant.messaging.app.kafka.DialogEventsProcessorConfig;
 
-import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.cluster.sharding.typed.javadsl.EntityTypeKey;
 import akka.persistence.typed.PersistenceId;
@@ -40,18 +38,6 @@ public class DialogActor extends EventSourcedBehaviorWithEnforcedReplies<DialogC
 		this.actorContext = actorContext;
 		this.dialogCommandHandlerConfigurers = dialogCommandHandlerConfigurers;
 		this.dialogEventHandlerConfigurers = dialogEventHandlerConfigurers;
-	}
-
-	public static void init(
-			ActorSystem<?> system,
-			int performSnapshotAfterEvents,
-			Collection<DialogCommandHandlerConfigurer> dialogCommandHandlerConfigurers,
-			Collection<DialogEventHandlerConfigurer> dialogEventHandlerConfigurers,
-			DialogEventsProcessorConfig eventsProcessorConfig
-	) {
-
-
-
 	}
 
 	@Override

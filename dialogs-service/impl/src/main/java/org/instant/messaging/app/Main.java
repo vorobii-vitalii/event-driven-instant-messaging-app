@@ -20,6 +20,7 @@ import org.instant.messaging.app.grpc.services.DialogWriteServiceImpl;
 import org.instant.messaging.app.kafka.DialogEventsProcessorConfigReader;
 import org.instant.messaging.app.kafka.KafkaProducerSettingsReader;
 import org.instant.messaging.app.projection.DelegatingProjectionHandler;
+import org.instant.messaging.app.r2dbc.impl.R2dbcSessionExecutorImpl;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -154,7 +155,9 @@ public class Main {
 		var producer = new SendProducer<>(producerSettings, system);
 
 		var dialogWriteService = new DialogWriteServiceImpl(producer, "dialog-commands");
-		var dialogReadService = new DialogReadServiceImpl(system, DaggerDialogEventsProjectionComponent.create().dialogRepository());
+		var dialogReadService = new DialogReadServiceImpl(
+				new R2dbcSessionExecutorImpl(system),
+				DaggerDialogEventsProjectionComponent.create().dialogRepository());
 
 		@SuppressWarnings("unchecked")
 		Function<HttpRequest, CompletionStage<HttpResponse>> serviceHandlers = ServiceHandler.concatOrNotFound(
