@@ -8,7 +8,6 @@ import org.instant.messaging.app.actor.dialog.state.DialogState;
 
 import akka.persistence.typed.javadsl.EventHandlerBuilder;
 
-// TODO: Register
 public class DialogClosedEventHandlerConfigurer implements DialogEventHandlerConfigurer {
 
 	@Override
