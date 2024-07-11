@@ -3,7 +3,7 @@ package org.instant.messaging.app.message.adapter.dialog;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.instant.message.app.DialogKafkaMessage;
-import org.instant.messaging.app.actor.dialog.command.MarkAsReadCommand;
+import org.instant.messaging.app.actor.dialog.command.LeaveConversationCommand;
 import org.junit.jupiter.api.Test;
 
 class TestLeaveConversationMessageDialogCommandMessageConverter extends BaseDialogCommandMessageConverterTest {
@@ -18,7 +18,7 @@ class TestLeaveConversationMessageDialogCommandMessageConverter extends BaseDial
 						.build())
 				.build();
 		assertThat(toCommand(kafkaMessage)).isEqualTo(
-				MarkAsReadCommand.builder()
+				LeaveConversationCommand.builder()
 						.dialogId(DIALOG_ID.toString())
 						.requester(REQUESTER)
 						.timestamp(TIMESTAMP)

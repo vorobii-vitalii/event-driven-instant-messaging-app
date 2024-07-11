@@ -3,11 +3,13 @@ package org.instant.messaging.app.dao.impl;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.instant.messaging.app.dao.DialogRepository;
@@ -16,7 +18,6 @@ import org.instant.messaging.app.domain.DialogMessage;
 
 import akka.projection.r2dbc.javadsl.R2dbcSession;
 
-// TODO: Register
 public class DialogRepositoryImpl implements DialogRepository {
 
 	public static final ZoneId UTC = ZoneId.of("UTC");
@@ -47,30 +48,51 @@ public class DialogRepositoryImpl implements DialogRepository {
 								.sentAt(String.valueOf(row.get("sent_at", LocalDateTime.class)))
 								.build())
 				.toCompletableFuture();
-		return CompletableFuture.allOf(dialogTopicFuture, participantsFuture, messagesFuture)
+		var seenFuture = session.select(
+						session.createStatement("select message_id, user_id from dialog_messages_seen where dialog_id = $1")
+								.bind(0, dialogId),
+						row -> new AbstractMap.SimpleEntry<>(row.get("message_id", String.class), row.get("user_id", String.class)))
+				.toCompletableFuture();
+
+		return CompletableFuture.allOf(dialogTopicFuture, participantsFuture, messagesFuture, seenFuture)
 				.thenApply(v -> dialogTopicFuture.join()
-						.map(dialogTopic ->
-								DialogDetails.builder()
-										.topic(dialogTopic)
-										.participants(participantsFuture.join())
-										.messages(messagesFuture.join()).build())
+						.map(dialogTopic -> {
+							return DialogDetails.builder()
+									.topic(dialogTopic)
+									.participants(participantsFuture.join())
+									.messages(enrichSeenBy(messagesFuture.join(), seenFuture.join()))
+									.build();
+						})
 						.orElseThrow());
+	}
+
+	private List<DialogMessage> enrichSeenBy(
+			List<DialogMessage> messages,
+			List<AbstractMap.SimpleEntry<String, String>> messageIdUserIdPairs
+	) {
+		var seenByMessageID = messageIdUserIdPairs.stream()
+				.collect(Collectors.groupingBy(
+						AbstractMap.SimpleEntry::getKey,
+						Collectors.mapping(v -> UUID.fromString(v.getValue()), Collectors.toList())));
+		return messages.stream()
+				.map(v -> v.toBuilder().seenBy(seenByMessageID.getOrDefault(v.id().toString(), List.of())).build())
+				.toList();
 	}
 
 	@Override
 	public CompletionStage<?> createNewDialog(R2dbcSession session, String dialogId, String dialogTopic, List<UUID> participants) {
 		return session.update(
 				Stream.concat(
-						Stream.of(session
-								.createStatement(
-										"INSERT INTO dialogs (dialog_id, dialog_topic) VALUES ($1, $2)")
-								.bind(0, dialogId)
-								.bind(1, dialogTopic)),
-						participants.stream()
-								.map(x -> session.createStatement("INSERT INTO dialog_participants (dialog_id, user_id) VALUES ($1, $2)")
+								Stream.of(session
+										.createStatement(
+												"INSERT INTO dialogs (dialog_id, dialog_topic) VALUES ($1, $2)")
 										.bind(0, dialogId)
-										.bind(1, x.toString())))
-				.toList());
+										.bind(1, dialogTopic)),
+								participants.stream()
+										.map(x -> session.createStatement("INSERT INTO dialog_participants (dialog_id, user_id) VALUES ($1, $2)")
+												.bind(0, dialogId)
+												.bind(1, x.toString())))
+						.toList());
 	}
 
 	@Override

@@ -51,6 +51,7 @@ public class DialogReadServiceImpl implements DialogReadService {
 				.setFrom(toGrpcUUID(msg.from()))
 				.setTimestamp(msg.sentAt())
 				.setContent(msg.messageContent())
+				.addAllSeen(msg.seenBy().stream().map(java.util.UUID::toString).toList())
 				.build();
 	}
 }

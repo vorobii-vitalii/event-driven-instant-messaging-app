@@ -227,3 +227,4 @@ GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
     "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
   }
 }
+

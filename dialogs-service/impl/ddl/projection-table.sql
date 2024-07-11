@@ -13,7 +13,7 @@ create table dialog_messages (
     dialog_id varchar(255) not null,
     content varchar(500) not null,
     user_id varchar(255) not null,
-    sent_at timestamp not null
+    sent_at timestamp with time zone not null
 );
 
 create table dialog_messages_seen
