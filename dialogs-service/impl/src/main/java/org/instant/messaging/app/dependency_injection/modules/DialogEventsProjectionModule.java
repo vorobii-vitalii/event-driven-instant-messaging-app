@@ -3,7 +3,14 @@ package org.instant.messaging.app.dependency_injection.modules;
 import java.util.Set;
 
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
+import org.instant.messaging.app.dao.DialogCreator;
+import org.instant.messaging.app.dao.DialogDetailsFetcher;
+import org.instant.messaging.app.dao.DialogMessageAdder;
+import org.instant.messaging.app.dao.DialogMessageRemover;
+import org.instant.messaging.app.dao.DialogMessageSeenMarker;
+import org.instant.messaging.app.dao.DialogRemover;
 import org.instant.messaging.app.dao.DialogRepository;
+import org.instant.messaging.app.dao.LeaveDialog;
 import org.instant.messaging.app.dao.impl.DialogRepositoryImpl;
 import org.instant.messaging.app.projection.CastingProjectionEventHandler;
 import org.instant.messaging.app.projection.DelegatingCastingProjectionEventHandler;

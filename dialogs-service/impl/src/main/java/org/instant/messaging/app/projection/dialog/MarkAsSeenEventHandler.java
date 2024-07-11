@@ -4,17 +4,17 @@ import java.util.concurrent.CompletionStage;
 
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
 import org.instant.messaging.app.actor.dialog.event.MessageMarkedAsReadEvent;
-import org.instant.messaging.app.dao.DialogRepository;
+import org.instant.messaging.app.dao.DialogMessageSeenMarker;
 import org.instant.messaging.app.projection.CastingProjectionEventHandler;
 
 import akka.Done;
 import akka.projection.r2dbc.javadsl.R2dbcSession;
 
 public class MarkAsSeenEventHandler implements CastingProjectionEventHandler<DialogEvent, MessageMarkedAsReadEvent> {
-	private final DialogRepository dialogRepository;
+	private final DialogMessageSeenMarker dialogMessageSeenMarker;
 
-	public MarkAsSeenEventHandler(DialogRepository dialogRepository) {
-		this.dialogRepository = dialogRepository;
+	public MarkAsSeenEventHandler(DialogMessageSeenMarker dialogMessageSeenMarker) {
+		this.dialogMessageSeenMarker = dialogMessageSeenMarker;
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class MarkAsSeenEventHandler implements CastingProjectionEventHandler<Dia
 
 	@Override
 	public CompletionStage<Done> handleSubTypeEvent(MessageMarkedAsReadEvent subType, String entityId, R2dbcSession session) {
-		return dialogRepository.markAsSeen(session, entityId, subType.messageId(), subType.requester())
+		return dialogMessageSeenMarker.markAsSeen(session, entityId, subType.messageId(), subType.requester())
 				.thenApply(v -> Done.done());
 	}
 }

@@ -7,17 +7,17 @@ import java.util.concurrent.CompletionStage;
 
 import org.instant.messaging.app.actor.dialog.event.DialogEvent;
 import org.instant.messaging.app.actor.dialog.event.DialogInitializedEvent;
-import org.instant.messaging.app.dao.DialogRepository;
+import org.instant.messaging.app.dao.DialogCreator;
 import org.instant.messaging.app.projection.CastingProjectionEventHandler;
 
 import akka.Done;
 import akka.projection.r2dbc.javadsl.R2dbcSession;
 
 public class DialogInitializedEventHandler implements CastingProjectionEventHandler<DialogEvent, DialogInitializedEvent> {
-	private final DialogRepository dialogRepository;
+	private final DialogCreator dialogCreator;
 
-	public DialogInitializedEventHandler(DialogRepository dialogRepository) {
-		this.dialogRepository = dialogRepository;
+	public DialogInitializedEventHandler(DialogCreator dialogCreator) {
+		this.dialogCreator = dialogCreator;
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class DialogInitializedEventHandler implements CastingProjectionEventHand
 	public CompletionStage<Done> handleSubTypeEvent(DialogInitializedEvent event, String entityId, R2dbcSession session) {
 		List<UUID> participants = new ArrayList<>(event.invitedParticipants());
 		participants.add(event.createdBy());
-		return dialogRepository.createNewDialog(
+		return dialogCreator.createNewDialog(
 				session,
 				entityId,
 				event.dialogTopic(),
