@@ -1,6 +1,8 @@
 package org.instant.messaging.app.dao.impl;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -16,6 +18,8 @@ import akka.projection.r2dbc.javadsl.R2dbcSession;
 
 // TODO: Register
 public class DialogRepositoryImpl implements DialogRepository {
+
+	public static final ZoneId UTC = ZoneId.of("UTC");
 
 	@Override
 	public CompletionStage<DialogDetails> fetchDialogDetails(R2dbcSession session, String dialogId) {
@@ -35,12 +39,12 @@ public class DialogRepositoryImpl implements DialogRepository {
 										"select u.message_id as message_id, u.content as content, u.user_id as user_id, u.sent_at as sent_at "
 												+ "from dialog_messages u "
 												+ "where u.dialog_id = $1")
-								.bind(1, dialogId),
+								.bind(0, dialogId),
 						row -> DialogMessage.builder()
 								.id(UUID.fromString(Objects.requireNonNull(row.get("message_id", String.class))))
 								.from(UUID.fromString(Objects.requireNonNull(row.get("user_id", String.class))))
 								.messageContent(Objects.requireNonNull(row.get("content", String.class)))
-								.sentAt(row.get("sent_at", Instant.class))
+								.sentAt(String.valueOf(row.get("sent_at", LocalDateTime.class)))
 								.build())
 				.toCompletableFuture();
 		return CompletableFuture.allOf(dialogTopicFuture, participantsFuture, messagesFuture)
@@ -99,7 +103,7 @@ public class DialogRepositoryImpl implements DialogRepository {
 						.bind(1, dialogId)
 						.bind(2, messageContent)
 						.bind(3, from.toString())
-						.bind(4, createdAt));
+						.bind(4, LocalDateTime.ofInstant(createdAt, UTC)));
 	}
 
 	@Override

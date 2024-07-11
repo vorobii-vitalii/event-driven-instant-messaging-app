@@ -1,5 +1,6 @@
 package org.instant.messaging.app.grpc.services;
 
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletionStage;
 
 import org.instant.message.app.DialogReadService;
@@ -27,7 +28,9 @@ public class DialogReadServiceImpl implements DialogReadService {
 	public CompletionStage<FetchDialogResponse> fetchDialog(FetchDialogQuery in) {
 		var dialogId = in.getDialogId().getValue();
 		log.info("Fetching dialog with id = {}", dialogId);
-		return R2dbcSession.withSession(actorSystem, session -> dialogRepository.fetchDialogDetails(session, dialogId))
+		return R2dbcSession.withSession(actorSystem, session -> {
+					return dialogRepository.fetchDialogDetails(session, dialogId);
+				})
 				.thenApply(v -> {
 					log.info("Mapping dialog details {}", v);
 					return FetchDialogResponse.newBuilder()
@@ -46,7 +49,7 @@ public class DialogReadServiceImpl implements DialogReadService {
 		return FetchDialogResponse.DialogMessage.newBuilder()
 				.setMessageId(toGrpcUUID(msg.id()))
 				.setFrom(toGrpcUUID(msg.from()))
-				.setTimestamp(msg.sentAt().toEpochMilli())
+				.setTimestamp(msg.sentAt())
 				.setContent(msg.messageContent())
 				.build();
 	}

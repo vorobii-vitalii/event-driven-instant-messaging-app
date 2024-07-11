@@ -79,3 +79,11 @@ GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/sendMessage
   "timestamp": "12323452242"
 }
 
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}

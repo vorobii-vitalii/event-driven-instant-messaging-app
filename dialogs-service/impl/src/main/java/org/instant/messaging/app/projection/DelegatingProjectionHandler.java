@@ -89,7 +89,7 @@ public class DelegatingProjectionHandler<EventType> extends R2dbcHandler<EventEn
 	public CompletionStage<Done> process(R2dbcSession session, EventEnvelope<EventType> eventEnvelope) {
 		log.info("Processing event {}", eventEnvelope);
 		EventType event = eventEnvelope.getEvent();
-		return projectionEventHandler.handleEvent(event, eventEnvelope.persistenceId(), session);
+		return projectionEventHandler.handleEvent(event, eventEnvelope.persistenceId().split("\\|")[1], session);
 	}
 
 }
