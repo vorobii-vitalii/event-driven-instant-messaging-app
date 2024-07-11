@@ -6,13 +6,13 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Stream;
 
 import org.instant.messaging.app.dao.DialogRepository;
 import org.instant.messaging.app.domain.DialogDetails;
 import org.instant.messaging.app.domain.DialogMessage;
 
 import akka.projection.r2dbc.javadsl.R2dbcSession;
-import io.r2dbc.spi.Statement;
 
 // TODO: Register
 public class DialogRepositoryImpl implements DialogRepository {
@@ -55,19 +55,18 @@ public class DialogRepositoryImpl implements DialogRepository {
 
 	@Override
 	public CompletionStage<?> createNewDialog(R2dbcSession session, String dialogId, String dialogTopic, List<UUID> participants) {
-		return session.updateOne(
-						session
+		return session.update(
+				Stream.concat(
+						Stream.of(session
 								.createStatement(
 										"INSERT INTO dialogs (dialog_id, dialog_topic) VALUES ($1, $2)")
 								.bind(0, dialogId)
-								.bind(1, dialogTopic))
-				.thenApplyAsync(v -> {
-					List<Statement> list = participants.stream()
-							.map(x -> session.createStatement("INSERT INTO dialog_participants (dialog_id, user_id) VALUES ($1, $2)")
-									.bind(0, dialogId)
-									.bind(1, x.toString())).toList();
-					return session.update(list);
-				});
+								.bind(1, dialogTopic)),
+						participants.stream()
+								.map(x -> session.createStatement("INSERT INTO dialog_participants (dialog_id, user_id) VALUES ($1, $2)")
+										.bind(0, dialogId)
+										.bind(1, x.toString())))
+				.toList());
 	}
 
 	@Override

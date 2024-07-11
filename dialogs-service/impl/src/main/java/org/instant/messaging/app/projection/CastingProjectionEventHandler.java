@@ -12,7 +12,7 @@ public interface CastingProjectionEventHandler<E, S extends E> extends Projectio
 		return handleSubTypeEvent((S) event, entityId, session);
 	}
 
-	Class<S> subType();
+	Class<? extends E> subType();
 
 	CompletionStage<Done> handleSubTypeEvent(S subType, String entityId, R2dbcSession session);
 

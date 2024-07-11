@@ -18,5 +18,6 @@ import dagger.Component;
 })
 public interface DialogEventsProcessorComponent {
 	DialogEventsProcessorInitializer dialogEventsProcessorInitializer();
+
 	MessageAdapter<ActorRef<StatusReply<Done>>, DialogKafkaMessage, DialogCommand> dialogKafkaMessageAdapter();
 }
