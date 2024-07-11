@@ -100,21 +100,33 @@ public class Main {
 									log.warn("Message {} cannot converted to command...", dialogKafkaMessage);
 									return CompletableFuture.completedFuture(committableMessage.committableOffset());
 								}
-								CompletionStage<StatusReply<Done>> askReply =
-										AskPattern.ask(
-												dialogCommandActorRef,
-												ref -> {
-													var command = messageAdapter.adaptMessage(dialogKafkaMessage, ref).orElseThrow();
-													log.info("Converter to command = {}", command);
-													return command;
-												},
-												PROCESSING_TIMEOUT,
-												system.scheduler()
-										);
-								return askReply.thenApply(v -> {
-									log.info("Processing res = {}. Committing offset", v);
-									return committableMessage.committableOffset();
-								});
+								log.info("Message is supported!");
+								try {
+									CompletionStage<StatusReply<Done>> askReply =
+											AskPattern.ask(
+													dialogCommandActorRef,
+													ref -> {
+														var command = messageAdapter.adaptMessage(dialogKafkaMessage, ref).orElseThrow();
+														log.info("Converter to command = {}", command);
+														return command;
+													},
+													PROCESSING_TIMEOUT,
+													system.scheduler()
+											);
+									return askReply
+											.handle((v, err) -> {
+												if (err != null) {
+													log.error("Error on message processing!", err);
+												} else {
+													log.info("Processing res = {}. Committing offset", v);
+												}
+												return committableMessage.committableOffset();
+											});
+								}
+								catch (Exception error) {
+									log.error("Error on processing", error);
+									return CompletableFuture.completedFuture(committableMessage.committableOffset());
+								}
 							})
 							.toMat(Committer.sink(committerSettings.withMaxBatch(1)), Consumer::createDrainingControl)
 							.run(system);

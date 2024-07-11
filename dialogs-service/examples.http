@@ -26,7 +26,6 @@
 #18f2a0c7-47b1-4e02-97b4-108f21b02eef
 #da49c1b2-18e8-4e2a-9281-22b81e1d0a02
 #7210b98f-abed-4e27-810c-11a9e2b21f2b
-#3fcd08e4-a217-440c-b20e-018239b01a1b
 #c4b17e02-68e4-4429-8b1a-20a827b18e0f
 #06e315a7-f93b-4d11-b01e-22a1b8231cef
 
@@ -146,3 +145,33 @@ GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
     "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
   }
 }
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/sendMessage
+
+{
+  "commandId": {
+    "value": "07862cab-d0f1-4b11-a08b-e1d02f17b9eg"
+  },
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  },
+  "content": "Text 2",
+  "from": {
+    "value": "4e7b218c-d7f4-4a22-8f19-11ca1b9a07f2"
+  },
+  "message_id": {
+    "value": "3fcd08e4-a217-440c-b20e-018239b01a1b"
+  },
+  "timestamp": "12323452217"
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
