@@ -91,7 +91,6 @@ class TestLeaveConversationDialogCommandHandlerConfigurer extends BaseDialogComm
 	@Test
 	void givenParticipantIsStillPresentInDialogAndHeIsLeaderAndThereAreNoOtherParticipantsInChat() {
 		UUID participant1 = UUID.randomUUID();
-		UUID participant2 = UUID.randomUUID();
 		ActorRef<StatusReply<Done>> replyTo = mock(ActorRef.class);
 		final Instant timestamp = Instant.now();
 

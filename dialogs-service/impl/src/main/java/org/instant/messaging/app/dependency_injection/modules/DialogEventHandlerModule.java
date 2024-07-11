@@ -1,10 +1,12 @@
 package org.instant.messaging.app.dependency_injection.modules;
 
+import org.instant.messaging.app.actor.dialog.event_handler.DialogClosedEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.DialogEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.DialogInitializedEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.MessageMarkedAsReadEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.MessageRemovedEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.MessageSentEventHandlerConfigurer;
+import org.instant.messaging.app.actor.dialog.event_handler.NewLeaderChosenEventHandlerConfigurer;
 import org.instant.messaging.app.actor.dialog.event_handler.ParticipantLeftEventHandlerConfigurer;
 
 import dagger.Module;
@@ -42,6 +44,18 @@ public class DialogEventHandlerModule {
 	@IntoSet
 	DialogEventHandlerConfigurer participantLeftEventHandlerConfigurer() {
 		return new ParticipantLeftEventHandlerConfigurer();
+	}
+
+	@Provides
+	@IntoSet
+	DialogEventHandlerConfigurer dialogClosedEventHandlerConfigurer() {
+		return new DialogClosedEventHandlerConfigurer();
+	}
+
+	@Provides
+	@IntoSet
+	DialogEventHandlerConfigurer newLeaderChosenEventHandlerConfigurer() {
+		return new NewLeaderChosenEventHandlerConfigurer();
 	}
 
 }
