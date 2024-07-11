@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ class TestLeaveConversationDialogCommandHandlerConfigurer extends BaseDialogComm
 
 	@SuppressWarnings("unchecked")
 	@Test
-	void givenParticipantIsStillPresentInDialog() {
+	void givenParticipantIsStillPresentInDialogAndHeIsNotLeader() {
 		UUID participant1 = UUID.randomUUID();
 		UUID participant2 = UUID.randomUUID();
 		ActorRef<StatusReply<Done>> replyTo = mock(ActorRef.class);
@@ -35,6 +36,7 @@ class TestLeaveConversationDialogCommandHandlerConfigurer extends BaseDialogComm
 
 		ReplyEffect<DialogEvent, DialogState> replyEffect = createCommandHandler().apply(
 				ActiveDialogState.builder()
+						.leader(participant2)
 						.participants(Set.of(participant1, participant2))
 						.build(),
 				LeaveConversationCommand.builder()
@@ -46,7 +48,9 @@ class TestLeaveConversationDialogCommandHandlerConfigurer extends BaseDialogComm
 				.usingRecursiveComparison()
 				.isEqualTo(
 						new EffectFactories<DialogEvent, DialogState>()
-								.persist(new ParticipantLeftEvent(participant1, timestamp))
+								.persist(List.of(
+										new ParticipantLeftEvent(participant1, timestamp)
+								))
 								.thenReply(replyTo, v -> StatusReply.ack()));
 	}
 
