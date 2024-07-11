@@ -12,11 +12,13 @@ import org.instant.message.app.DialogWriteService;
 import org.instant.message.app.DialogWriteServiceHandlerFactory;
 import org.instant.messaging.app.actor.dialog.DialogActor;
 import org.instant.messaging.app.dependency_injection.components.DaggerDialogEventsProcessorComponent;
+import org.instant.messaging.app.dependency_injection.components.DaggerDialogEventsProjectionComponent;
 import org.instant.messaging.app.grpc.config.DialogGrpcServiceConfigReader;
 import org.instant.messaging.app.grpc.services.DialogReadServiceImpl;
 import org.instant.messaging.app.grpc.services.DialogWriteServiceImpl;
 import org.instant.messaging.app.kafka.DialogEventsProcessorConfigReader;
 import org.instant.messaging.app.kafka.KafkaProducerSettingsReader;
+import org.instant.messaging.app.projection.DelegatingProjectionHandler;
 
 import com.typesafe.config.ConfigFactory;
 
@@ -65,50 +67,63 @@ public class Main {
 			ClusterBootstrap.get(system).start();
 
 			startGrpcServer(system);
-
-			var config = system.settings().config();
-
-			var dialogEventsProcessorConfig = new DialogEventsProcessorConfigReader().readConfig(config, system);
-
-			var eventsProcessorComponent = DaggerDialogEventsProcessorComponent.create();
-			var messageAdapter = eventsProcessorComponent.dialogKafkaMessageAdapter();
-
-			eventsProcessorComponent
-					.dialogEventsProcessorInitializer()
-					.initialize(dialogEventsProcessorConfig, system)
-					.thenAccept(dialogCommandActorRef -> {
-						var rebalanceListener = KafkaClusterSharding.get(system).rebalanceListener(DialogActor.ENTITY_KEY);
-						var subscription = Subscriptions.topics(dialogEventsProcessorConfig.topic())
-								.withRebalanceListener(Adapter.toClassic(rebalanceListener));
-						var consumerSettings = dialogEventsProcessorConfig.getConsumerSettings();
-						CommitterSettings committerSettings = CommitterSettings.create(config.getConfig("akka.kafka.committer"));
-						Consumer.committableSource(consumerSettings, subscription)
-								.mapAsync(1, committableMessage -> {
-									var record = committableMessage.record();
-									log.info("Consuming record = {}", record);
-									var dialogKafkaMessage = DialogKafkaMessage.parseFrom(record.value());
-									if (!messageAdapter.isSupported(dialogKafkaMessage)) {
-										log.warn("Message {} cannot converted to command...", dialogKafkaMessage);
-										return CompletableFuture.completedFuture(committableMessage.committableOffset());
-									}
-									CompletionStage<StatusReply<Done>> askReply =
-											AskPattern.ask(
-													dialogCommandActorRef,
-													ref -> messageAdapter.adaptMessage(dialogKafkaMessage, ref).orElseThrow(),
-													PROCESSING_TIMEOUT,
-													system.scheduler()
-											);
-									return askReply.thenApply(v -> {
-										log.info("Processing res = {}. Committing offset", v);
-										return committableMessage.committableOffset();
-									});
-								})
-								.toMat(Committer.sink(committerSettings.withMaxBatch(1)), Consumer::createDrainingControl)
-								.run(system);
-					});
+			startProjection(system);
+			startEventsProcessor(system);
 
 			return Behaviors.ignore();
 		});
+	}
+
+	private static void startEventsProcessor(ActorSystem<Void> system) {
+		var config = system.settings().config();
+		var dialogEventsProcessorConfig = new DialogEventsProcessorConfigReader().readConfig(config, system);
+		var eventsProcessorComponent = DaggerDialogEventsProcessorComponent.create();
+		var messageAdapter = eventsProcessorComponent.dialogKafkaMessageAdapter();
+
+		eventsProcessorComponent
+				.dialogEventsProcessorInitializer()
+				.initialize(dialogEventsProcessorConfig, system)
+				.thenAccept(dialogCommandActorRef -> {
+					var rebalanceListener = KafkaClusterSharding.get(system).rebalanceListener(DialogActor.ENTITY_KEY);
+					var subscription = Subscriptions.topics(dialogEventsProcessorConfig.topic())
+							.withRebalanceListener(Adapter.toClassic(rebalanceListener));
+					var consumerSettings = dialogEventsProcessorConfig.getConsumerSettings();
+					CommitterSettings committerSettings = CommitterSettings.create(config.getConfig("akka.kafka.committer"));
+					Consumer.committableSource(consumerSettings, subscription)
+							.mapAsync(1, committableMessage -> {
+								var record = committableMessage.record();
+								log.info("Consuming record = {}", record);
+								var dialogKafkaMessage = DialogKafkaMessage.parseFrom(record.value());
+								if (!messageAdapter.isSupported(dialogKafkaMessage)) {
+									log.warn("Message {} cannot converted to command...", dialogKafkaMessage);
+									return CompletableFuture.completedFuture(committableMessage.committableOffset());
+								}
+								CompletionStage<StatusReply<Done>> askReply =
+										AskPattern.ask(
+												dialogCommandActorRef,
+												ref -> messageAdapter.adaptMessage(dialogKafkaMessage, ref).orElseThrow(),
+												PROCESSING_TIMEOUT,
+												system.scheduler()
+										);
+								return askReply.thenApply(v -> {
+									log.info("Processing res = {}. Committing offset", v);
+									return committableMessage.committableOffset();
+								});
+							})
+							.toMat(Committer.sink(committerSettings.withMaxBatch(1)), Consumer::createDrainingControl)
+							.run(system);
+				});
+	}
+
+	private static void startProjection(ActorSystem<Void> system) {
+		DelegatingProjectionHandler.initProjectionProcess(
+				system,
+				DaggerDialogEventsProjectionComponent.create().dialogEventsProjectionHandler(),
+				3,
+				"DialogEventsDatabaseUpdateProjection",
+				DialogActor.ENTITY_KEY.name(),
+				"dialog-events-"
+		);
 	}
 
 	private static void startGrpcServer(ActorSystem<?> system) {
@@ -121,7 +136,7 @@ public class Main {
 		var producer = new SendProducer<>(producerSettings, system);
 
 		var dialogWriteService = new DialogWriteServiceImpl(producer, "dialog-commands");
-		var dialogReadService = new DialogReadServiceImpl();
+		var dialogReadService = new DialogReadServiceImpl(system, DaggerDialogEventsProjectionComponent.create().dialogRepository());
 
 		@SuppressWarnings("unchecked")
 		Function<HttpRequest, CompletionStage<HttpResponse>> serviceHandlers = ServiceHandler.concatOrNotFound(

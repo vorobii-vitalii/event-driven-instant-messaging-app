@@ -65,6 +65,7 @@ message FetchDialogResponse {
     UUID message_id = 1;
     UUID from = 2;
     int64 timestamp = 3;
+    string content = 4;
   }
 }
 

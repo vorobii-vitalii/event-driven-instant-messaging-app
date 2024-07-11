@@ -10,7 +10,6 @@ import org.instant.messaging.app.projection.CastingProjectionEventHandler;
 import akka.Done;
 import akka.projection.r2dbc.javadsl.R2dbcSession;
 
-// TODO: Register
 public class DialogClosedEventHandler implements CastingProjectionEventHandler<DialogEvent, DialogClosedEvent> {
 	private final DialogRepository dialogRepository;
 
