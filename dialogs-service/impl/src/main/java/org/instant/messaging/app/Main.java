@@ -119,7 +119,7 @@ public class Main {
 		DelegatingProjectionHandler.initProjectionProcess(
 				system,
 				DaggerDialogEventsProjectionComponent.create().dialogEventsProjectionHandler(),
-				3,
+				4,
 				"DialogEventsDatabaseUpdateProjection",
 				DialogActor.ENTITY_KEY.name(),
 				"dialog-events-"
