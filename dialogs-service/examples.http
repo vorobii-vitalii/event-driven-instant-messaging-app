@@ -1,0 +1,230 @@
+// dialogId
+#8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a
+
+// creator
+#4e7b218c-d7f4-4a22-8f19-11ca1b9a07f2
+
+// command ids
+#07862cab-d0f1-4b11-a08b-e1d02f17b9e2
+#1ca3b90d-f029-4e23-9b0e-271f07b22f9c
+#d9f76e12-b38e-4f0b-8942-1b08e237d021
+#6a5e1d0b-781e-4d42-a27e-2ca138b9c1f4
+#c1b8427f-9812-4e81-b04d-a0b18e271d0f
+
+// participans
+#9210f3a5-b749-4d4e-b08a-2b987e1a231b
+#c8d6a1fe-f20e-4d13-871c-1027b38dcef9
+#01a2e47b-a13d-48b8-a909-b218e1d23f0a
+
+// messages
+#903efb1d-7892-4e2f-83a2-02b72e239a21
+#5cf4128a-3d1a-400b-b81e-1ab0dfb121ef
+#eb783d01-f2c1-4e15-a784-b028e2a03b19
+#18f2a0c7-47b1-4e02-97b4-108f21b02eef
+#da49c1b2-18e8-4e2a-9281-22b81e1d0a02
+#7210b98f-abed-4e27-810c-11a9e2b21f2b
+#c4b17e02-68e4-4429-8b1a-20a827b18e0f
+#06e315a7-f93b-4d11-b01e-22a1b8231cef
+
+###
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/initializeDialog
+
+{
+  "commandId": {
+    "value": "3dfc4b21-e21d-4f2d-b87e-d12c7e2ac2ef"
+  },
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  },
+  "dialogTopic": "Dialog 1",
+  "participantsToInvite": [
+    {
+      "value": "9210f3a5-b749-4d4e-b08a-2b987e1a231b"
+    },
+    {
+      "value": "c8d6a1fe-f20e-4d13-871c-1027b38dcef9"
+    },
+    {
+      "value": "01a2e47b-a13d-48b8-a909-b218e1d23f0a"
+    }
+  ],
+  "requester": {
+    "value": "4e7b218c-d7f4-4a22-8f19-11ca1b9a07f2"
+  },
+  "timestamp": "12323452242"
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/sendMessage
+
+{
+  "commandId": {
+    "value": "07862cab-d0f1-4b11-a08b-e1d02f17b9e2"
+  },
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  },
+  "content": "Text 1",
+  "from": {
+    "value": "9210f3a5-b749-4d4e-b08a-2b987e1a231b"
+  },
+  "message_id": {
+    "value": "2a178f4c-b42e-4d9b-a07d-c1b27e128f0a"
+  },
+  "timestamp": "12323452242"
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC localhost:8080/instant_messaging_app.DialogWriteService/leaveConversation
+
+{
+  "commandId": {
+    "value": "2bec87a1-42e8-4a1d-8211-10f2b91d0e1a"
+  },
+  "timestamp": "12323452212",
+  "requester": {
+    "value": "c8d6a1fe-f20e-4d13-871c-1027b38dcef9"
+  },
+  "dialogId": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC localhost:8080/instant_messaging_app.DialogWriteService/leaveConversation
+
+{
+  "commandId": {
+    "value": "2bec87a1-42e8-4a1d-8211-10f2b91d0e1b"
+  },
+  "timestamp": "12323452215",
+  "requester": {
+    "value": "01a2e47b-a13d-48b8-a909-b218e1d23f0a"
+  },
+  "dialogId": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/sendMessage
+
+{
+  "commandId": {
+    "value": "07862cab-d0f1-4b11-a08b-e1d02f17b9eg"
+  },
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  },
+  "content": "Text 2",
+  "from": {
+    "value": "4e7b218c-d7f4-4a22-8f19-11ca1b9a07f2"
+  },
+  "message_id": {
+    "value": "3fcd08e4-a217-440c-b20e-018239b01a1b"
+  },
+  "timestamp": "12323452217"
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogWriteService/markAsRead
+
+{
+  "requester": {
+    "value": "9210f3a5-b749-4d4e-b08a-2b987e1a231b"
+  },
+  "timestamp": "12323452218",
+  "commandId": {
+    "value": "2bec87a1-42e8-4a1d-8211-10f2b91d0e1a"
+  },
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  },
+  "message_id": {
+    "value": "3fcd08e4-a217-440c-b20e-018239b01a1b"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+
+###
+GRPC localhost:8080/instant_messaging_app.DialogWriteService/removeMessage
+
+{
+  "message_id": {
+    "value": "3fcd08e4-a217-440c-b20e-018239b01a1b"
+  },
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  },
+  "commandId": {
+    "value": "6a5e1d0b-781e-4d42-a27e-2ca138b9c1f4"
+  },
+  "timestamp": "12323452219",
+  "requester": {
+    "value": "4e7b218c-d7f4-4a22-8f19-11ca1b9a07f2"
+  }
+}
+
+###
+GRPC 127.0.0.1:8080/instant_messaging_app.DialogReadService/fetchDialog
+
+{
+  "dialog_id": {
+    "value": "8ab91c0f-e19e-4d1b-9a0b-c21f1d2e2f1a"
+  }
+}
+

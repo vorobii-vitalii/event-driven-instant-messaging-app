@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.instant.message.app";
+option java_outer_classname = "DialogsCommonProto";
+
+package instant_messaging_app;
+
+message UUID {
+  string value = 1;
+}
+
+message Acknowledgement {
+  bool success = 1;
+}
